@@ -1,0 +1,6 @@
+# virtualenv
+venv
+
+# Max OSX
+.DS_Store
+
