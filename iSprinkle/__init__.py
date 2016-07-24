@@ -3,12 +3,15 @@ from flask import Flask, g
 
 app = Flask(__name__)
 from iSprinkle.StationControl import StationControl
+from iSprinkle.SettingsHandler import SettingsHandler
+
 import iSprinkle.views, sqlite3, os, json
 
 settings_file = '../data/settings.json'
 settings_path = os.path.join(app.root_path, settings_file)
 
 station_control = None
+settings_handler = None
 
 MAX_STATIONS = 8
 
@@ -45,45 +48,24 @@ def close_db(error):
 '''
 
 
-def check_settings():
-    global settings_path
-    # Create settings.json, raise exception if couldn't
-    if not os.path.isfile(settings_path):
-        print("Creating default settings file")
-        # default timezone is -07:00
-        default_settings = {"timezone_offset": "-07:00",
-                            "stations": {"s0": {}, "s1": {}, "s2": {},
-                                         "s3": {}, "s4": {}, "s5": {},
-                                         "s6": {}, "s7": {}}}
-        try:
-            with open(settings_path, 'w') as settings_file_handle:
-                json.dump(default_settings, settings_file_handle)
-        except OSError:
-            raise OSError("Couldn't create a new settings file")
-    else:
-        print("Found settings file")
+def create_settings_handler():
+    global settings_handler, settings_path
+    settings_handler = SettingsHandler(settings_path)
 
 
 def create_station_control():
-    global station_control, settings_path
-    try:
-        with open(settings_path, 'r') as settings_file_handle:
-            settings_json = json.load(settings_file_handle)
-            station_control = StationControl(MAX_STATIONS, settings_json)
-    except OSError:
-        raise OSError("Error reading settings file")
-    if station_control:
-        print("Instantiated new StationControl object")
-    else:
-        raise RuntimeError("Couldn't instantiate new StationControl object")
+    global station_control
+    station_control = StationControl(MAX_STATIONS, settings_handler)
 
 
 # Always run these
 def setup():
     try:
-        check_settings()
+        create_settings_handler()
         create_station_control()
     except (RuntimeError, OSError) as e:
         print(e)
         # cleanup
         quit(0)
+
+import iSprinkle.controllers

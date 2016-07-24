@@ -1,6 +1,10 @@
 var iSprinkleApp = angular.module('iSprinkleApp', ['ngRoute']);
 
-iSprinkleApp.config(['$routeProvider', function($routeProvider) {
+iSprinkleApp.config(['$routeProvider', '$logProvider', function($routeProvider, $logProvider) {
+  // for debugging
+  $logProvider.debugEnabled(true);
+
+  // routes for controllers
   $routeProvider
   .when('/', {
     templateUrl: 'static/views/home/index.html',
