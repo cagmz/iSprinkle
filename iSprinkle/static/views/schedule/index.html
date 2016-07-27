@@ -1,3 +1,8 @@
+
+          <!-- Timepicker -->
+    <link type="text/css" href="static/bootstrap/css/timepicker.css"/>
+    <script type="text/javascript" src="static/bootstrap/js/bootstrap-timepicker.js"></script>
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Schedule Panel</h3>
@@ -6,38 +11,15 @@
 
         <div ng-switch-when="true">Error: Unable to contact web api</div>
         <div ng-switch-when="false">
-            <table class="table table-bordered">
+            <table id="scheduleTable" class="table table-bordered">
                 <thead>
-                <tr>
-                    <!-- Print the header array in the ScheduleController scope -->
-                    <th ng-repeat="col in header">{{ col }}</th>
-                </tr>
+                <!-- Print the header array in the ScheduleController scope -->
+                <tr><th ng-repeat="column in tableHeader">{{ column }}</th></tr>
                 </thead>
+                <!-- Inject the contents of cellInject and make sure they are bounded-->
                 <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@TwBootstrap</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
-                <tr>
-                    <th scope="row">4</th>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>@twitter</td>
-                </tr>
+                <!-- May need to inject rows here, but should use ng-model, or a button to bind object -->
+                <ng-bind-html ng-bind-html="cellInject"></ng-bind-html>
                 </tbody>
             </table>
         </div>

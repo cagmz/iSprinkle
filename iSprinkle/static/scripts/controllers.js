@@ -7,21 +7,68 @@ iSprinkleApp.controller('HomeController',
 
 iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', 'StationFactory',
   function ScheduleController($scope, $http, $log, StationFactory) {
-    // use ng-repeat to create table and fill data
-    $scope.header = ['Stations', 'Monday', 'Tuesday', 'Wednesday', 'Thurday', 'Friday', 'Saturday', 'Sunday'];
 
-    // TODO: use API get request to get schedule, and use it to populate schedule
     $scope.numberOfStations = -1;
     StationFactory.getNumberOfStations().then(function (response) {
       $scope.numberOfStations = response.data.stations;
-      $scope.stations = [];
-      for (var i = 0; i < $scope.numberOfStations; i++) {
-        $scope.stations.push(i + 1);
-      }
-    }).catch(function (err) {
-      $log.debug("Unable to contact API");
+      StationFactory.getSchedule().then(function (response) {
+
+        $scope.schedule = response.data;
+
+        if ($scope.numberOfStations && $scope.schedule) {
+          $log.debug($scope.numberOfStations);
+          $log.debug($scope.schedule);
+        }
+
+        $scope.weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $scope.tableHeader = ['Stations'].concat($scope.weekdays);
+
+        var scheduleTable = angular.element('#scheduleTable');
+        debugger;
+        $scope.cellInject = "";
+        var l = 0, m = 0;
+        for (var i = 0; i < $scope.weekdays.length; i++) {
+          $scope.cellInject += "<tr><td>Station " + i;
+          for (var j = 0; j < $scope.numberOfStations; j++, l++, m++) {
+            var startTime = [
+              '        <div class="bootstrap-timepicker">',
+              '            <input id="startTime' + l + '" type="text" class="input-small">',
+              '            <i class="icon-time"></i>',
+              '        </div>',
+              '        <script type="text/javascript">',
+              '            $("#startTime' + l + '").timepicker({',
+              '                template: false,',
+              '                showInputs: false,',
+              '                minuteStep: 5',
+              '            });',
+              '        </script>',
+              ''
+            ].join('');
+            var duration = [
+              '        <div class="bootstrap-timepicker">',
+              '            <input id="duration' + m + '" type="text" class="input-small">',
+              '            <i class="icon-time"></i>',
+              '        </div>',
+              '        <script type="text/javascript">',
+              '            $("#startTime' + m + '").timepicker({',
+              '                template: false,',
+              '                showInputs: false,',
+              '                minuteStep: 5',
+              '            });',
+              '        </script>',
+              ''
+            ].join('');
+            $scope.cellInject += startTime + duration;
+          }
+          $scope.cellInject += "</td></tr>"
+        }
+
+            debugger;
+
+      });
     });
-}]);
+
+  }]);
 
 iSprinkleApp.controller('ManualController',
   function ManualController($scope) {

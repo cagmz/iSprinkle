@@ -1,4 +1,4 @@
-var iSprinkleApp = angular.module('iSprinkleApp', ['ngRoute']);
+var iSprinkleApp = angular.module('iSprinkleApp', ['ngRoute', 'ngSanitize']);
 
 iSprinkleApp.config(['$routeProvider', '$logProvider', function($routeProvider, $logProvider) {
   // for debugging

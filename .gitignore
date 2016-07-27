@@ -1,6 +1,13 @@
 # virtualenv
 venv
 
-# Max OSX
+.idea
+
+# settings file
+data
+
+rsync.txt
+
+*.pyc
 .DS_Store
 

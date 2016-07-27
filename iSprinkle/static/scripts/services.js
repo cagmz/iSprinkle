@@ -4,8 +4,8 @@ iSprinkleApp.factory('StationFactory', ['$http', '$log', function ($http, $log) 
     getNumberOfStations: function() {
       return $http.get('api/stations');
     },
-    foo: function() {
-      return -1;
+    getSchedule: function() {
+      return $http.get('api/schedule')
     }
   }
   
