@@ -7,46 +7,18 @@ from iSprinkle.SettingsHandler import SettingsHandler
 
 import iSprinkle.views, sqlite3, os, json
 
+# local dev path
 settings_file = '../data/settings.json'
+
+# cloud 9 path
+# settings_file = 'data/settings.json'
+
 settings_path = os.path.join(app.root_path, settings_file)
 
 station_control = None
 settings_handler = None
 
 MAX_STATIONS = 8
-
-'''
-database = '/data/database.db'
-
-
-def setup_database():
-    default_config = dict(DATABASE=os.path.join(app.root_path, database),
-                          SECRET_KEY='development key', USERNAME='admin',
-                          PASSWORD='default')
-    app.config.update(default_config)
-
-
-def connect_database():
-    rv = sqlite3.connect(app.config['DATABASE'])
-    rv.row_factory = sqlite3.Row
-    return rv
-
-
-def get_db():
-    """comments"""
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connect_database()
-    return g.sqlite_db
-
-
-@app.teardown_appcontext
-def close_db(error):
-    """more comments"""
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connect_database()
-    return g.sqlite_db
-'''
-
 
 def create_settings_handler():
     global settings_handler, settings_path

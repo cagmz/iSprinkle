@@ -23,20 +23,16 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', 'Stati
         $scope.weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         $scope.tableHeader = ['Stations'].concat($scope.weekdays);
 
-        var scheduleTable = angular.element('#scheduleTable');
-        debugger;
-        $scope.cellInject = "";
+        $scope.cellInject = new Array($scope.numberOfStations);
         var l = 0, m = 0;
-        for (var i = 0; i < $scope.weekdays.length; i++) {
-          $scope.cellInject += "<tr><td>Station " + i;
-          for (var j = 0; j < $scope.numberOfStations; j++, l++, m++) {
-            var startTime = [
-              '        <div class="bootstrap-timepicker">',
-              '            <input id="startTime' + l + '" type="text" class="input-small">',
-              '            <i class="icon-time"></i>',
-              '        </div>',
-              '        <script type="text/javascript">',
-              '            $("#startTime' + l + '").timepicker({',
+        for (var i = 0; i < $scope.numberOfStations; i++) {
+          $scope.cellInject[i] = "<tr><td>Station " + i + "</td>";
+          for (var j = 0; j < $scope.weekdays.length; j++, l++, m++) {
+            var startTime = ['<label for="s' + l + 'startTime">Start:</label>',
+              '            <input id="s' + l + '_startTime" type="text" class="input-small">',
+              '            <script type="text/javascript">',
+              '            $("#s' + l + '_startTime").timepicker({',
+              '                defaultTime:\'12:00 AM\',',
               '                template: false,',
               '                showInputs: false,',
               '                minuteStep: 5',
@@ -44,26 +40,24 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', 'Stati
               '        </script>',
               ''
             ].join('');
-            var duration = [
-              '        <div class="bootstrap-timepicker">',
-              '            <input id="duration' + m + '" type="text" class="input-small">',
-              '            <i class="icon-time"></i>',
-              '        </div>',
-              '        <script type="text/javascript">',
-              '            $("#startTime' + m + '").timepicker({',
+            var duration = ['<label for="s' + l + '_duration">Time:</label>',
+              '            <input id="s' + m + '_duration" type="text" class="input-small" placeholder="HH:MM">',
+              '            <script type="text/javascript">',
+              '            $("#s' + m + '_duration").timepicker({',
+              '                defaultTime:0,',
               '                template: false,',
+              '                showMeridian: false,',
               '                showInputs: false,',
-              '                minuteStep: 5',
+              '                minuteStep: 1',
               '            });',
               '        </script>',
               ''
             ].join('');
-            $scope.cellInject += startTime + duration;
+            $scope.cellInject[i] += "<td>" + startTime + duration + "</td>";
           }
-          $scope.cellInject += "</td></tr>"
+          $scope.cellInject[i] += "</tr>"
+          $('#scheduleTable > tbody').append($scope.cellInject[i]);
         }
-
-            debugger;
 
       });
     });

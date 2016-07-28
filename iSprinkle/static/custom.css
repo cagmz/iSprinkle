@@ -6,3 +6,12 @@ body {
 .navbar {
   margin-bottom: 20px;
 }
+
+.input-small {
+  width: 65px;
+}
+
+label {
+  margin: 0px;
+  font-weight: normal;
+}
