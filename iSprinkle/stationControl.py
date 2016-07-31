@@ -14,7 +14,6 @@ class StationControl(object):
         # self.station_status = {stationId: ON|OFF}
         self.station_status = {}
         self.reset_stations()
-        print("debug")
 
         # schedule dict is a parsed version of the watering schedule in settings.json
         # unparsed schedule is in SettingsHandler object
