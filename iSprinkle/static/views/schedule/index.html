@@ -1,15 +1,25 @@
+<!-- Debugging :) Use Devtools to select an element, then call ng() -->
+<script>function ng() {
+    return $('#scheduleTable').scope();
+}</script>
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Schedule Panel</h3>
     </div>
-    <div ng-switch="numberOfStations == -1" class="panel-body">
-
-        <div ng-switch-when="true">Error: Unable to contact web api</div>
-        <div ng-switch-when="false">
+    <div ng-if="numberOfStations === -1" class="panel-body">
+        <div>Error: Unable to contact Web API</div>
+    </div>
+    <div ng-if="numberOfStations !== -1">
+        <div class="panel-body">
             <table id="scheduleTable" class="table table-bordered">
                 <!-- Rows are dynamically generated in the controller and compiled by Angular -->
             </table>
         </div>
-
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+                <a href="#" class="btn btn-default">Go Back</a>
+            </div>
+        </div>
     </div>
 </div> <!-- /ScheduleController div -->

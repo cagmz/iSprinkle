@@ -5,7 +5,6 @@ iSprinkleApp.controller('HomeController',
     $scope.helloWorld = "HomeController";
   });
 
-
 iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$compile','StationFactory',
   function ScheduleController($scope, $http, $log, $compile ,StationFactory) {
 
@@ -81,14 +80,14 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
       });
     });
 
-  }]);
+}]);
 
 iSprinkleApp.controller('ManualController',
   function ManualController($scope) {
     $scope.helloWorld = "ManualController";
-  });
+});
 
 iSprinkleApp.controller('AdminController',
   function AdminController($scope) {
     $scope.helloWorld = "AdminController";
-  });
+});
