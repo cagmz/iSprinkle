@@ -30,45 +30,35 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
           var stationSchedule = $scope.scheduleData.schedule[station];
           var stationNumber = station.substring(1);
           rowInject += "<tr><td>Station " + stationNumber + "</td>";
-          // debugger;
+
           for(var i = 0; i < $scope.weekdays.length; i++) {
             // dayInfo is an object with start time (string) and duration (int)
             // eg 'Monday' {"start_time": "12:00 AM", "duration": 5}
-            //debugger;
+
             var currentDay = $scope.weekdays[i];
             var dayInfo = stationSchedule[currentDay];
             var startTime = dayInfo['start_time'];
             var duration = dayInfo['duration'];
 
-            var startTime = ['<label for="'+ station + '_startTime">Start:</label>',
-              //'            <input id="'+ station + '_startTime" type="text" class="input-small">',
-              '            <input id="'+ station + '_startTime" ng-model="scheduleData.schedule.' + station+ '.' + currentDay+ '.' + 'start_time" type="text" class="input-small">',
-              //'            <script type="text/javascript">',
-              //'            $("#' + station + '_startTime").timepicker({',
-              //'                defaultTime:\'' + dayInfo['start_time'] + '\',',
-              //'defaultTime: false,',
-              //'                template: false,',
-              //'                showInputs: false,',
-              //'                minuteStep: 5',
-              //'            });',
-              //'        </script>',
-              //''
-            ].join('');
-            var duration = ['<label for="'+ station + '_duration">Time:</label>',
-              '            <input id="'+ station + '_duration" type="text" class="input-small" placeholder="HH:MM">',
+            var startTime = ['<label for="'+ station + '_startTime' + currentDay + '">Start:</label>',
+              '            <input id="'+ station + '_startTime' + currentDay + '" + ng-model="scheduleData.schedule.' + station+ '.' + currentDay+ '.' + 'start_time" type="text" class="input-small">',
               '            <script type="text/javascript">',
-              '            $("#' + station + '_duration").timepicker({',
-              // '                defaultTime:' + dayInfo['duration'] +',',
-              '                defaultTime:0,',
+              '            $("#' + station + '_startTime' + currentDay + '").timepicker({',
+              //'                defaultTime:\'' + dayInfo['start_time'] + '\',',
+              'defaultTime: false,',
               '                template: false,',
-              '                showMeridian: false,',
               '                showInputs: false,',
-              '                minuteStep: 1',
+              '                minuteStep: 5',
               '            });',
               '        </script>',
               ''
             ].join('');
-            rowInject += "<td>" + startTime + duration + "</td>";
+
+            // need to set listener for duration so that users can't enter negative number
+            var duration = ['<label for="'+ station + '_duration">Time: </label>',
+              '<input id="'+ station + '_duration" ng-model="scheduleData.schedule.' + station+ '.' + currentDay+ '.' + 'duration" type="number" min="0" class="input-small">'
+            ].join('');
+            rowInject += '<td><div class="form-group>"' + startTime + duration + '</div></td>';
           }
           rowInject += "</tr>";
           //debugger;
