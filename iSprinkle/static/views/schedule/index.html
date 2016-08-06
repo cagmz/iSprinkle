@@ -7,13 +7,7 @@
         <div ng-switch-when="true">Error: Unable to contact web api</div>
         <div ng-switch-when="false">
             <table id="scheduleTable" class="table table-bordered">
-                <thead>
-                <!-- Print the header array in the ScheduleController scope -->
-                <tr><th ng-repeat="column in tableHeader">{{ column }}</th></tr>
-                </thead>
-                <tbody>
-                <!-- Inject the contents of cellInject and make sure they are bounded-->
-                </tbody>
+                <!-- Rows are dynamically generated in the controller and compiled by Angular -->
             </table>
         </div>
 
