@@ -1,9 +1,11 @@
-import os, json
+import os
+import json
 
 # test if an existing file loads
 # test if no file is present
 #   test update settings
 #   test load settings
+
 
 class SettingsHandler(object):
     def __init__(self, settings_path):
@@ -290,19 +292,18 @@ class SettingsHandler(object):
 
     def get_schedule(self):
         schedule = {'timezone_offset': self.get_key('timezone_offset'), 'schedule': self.get_key('schedule')}
+        print("StationHandler's getSchedule() was called")
         print(schedule)
         return schedule
 
-    # test if key doesn't exist
+    # used to set the schedule from controllers.py
+    # eg self.settings['schedule'] = scheduleData['schedule']
     def set_key(self, key, value):
-        # eg self.settings['schedule'] = schedule_json
         self.settings[key] = value
+        return True
 
-    # test various null and existing keys
     def get_key(self, key):
-        value = None
         try:
-            value = self.settings[key]
+            return self.settings[key]
         except KeyError:
-            pass
-        return value
+            return "Error: key {} doesn't exist in the SettingsHandler settings".format(key)
