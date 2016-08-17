@@ -19,9 +19,7 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
         $scope.weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         // view uses tableHeader to create table heading
         $scope.tableHeader = ['Stations'].concat($scope.weekdays);
-
-        // todo: try compiling & injecting one row at a time
-        // todo: finalize injected markup and remove extra
+        
         var rowInject = '<thead><tr><th ng-repeat="column in tableHeader">{{ column }}</th></tr></thead><tbody>';
         for (var station in $scope.scheduleData.schedule) {
           // $log.debug(station);
@@ -44,26 +42,25 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
             var duration = dayInfo['duration'];
 
             var startTime = ['<label for="'+ station + '_startTime' + currentDay + '">Start:</label>',
-              '            <input id="'+ station + '_startTime' + currentDay + '" + ng-model="scheduleData.schedule.' + station+ '.' + currentDay+ '.' + 'start_time" type="text" class="input-small">',
-              '            <script type="text/javascript">',
-              '            $("#' + station + '_startTime' + currentDay + '").timepicker({',
-              '                defaultTime: false,',
-              '                template: false,',
-              '                showInputs: false,',
-              '                minuteStep: 5',
-              '            });',
-              '        </script>',
+              '<input id="'+ station + '_startTime' + currentDay + '" ' +
+              '+ ng-model="scheduleData.schedule.' + station+ '.' + currentDay+ '.' + 'start_time" ' +
+              'type="text" class="input-small">',
+              '<script type="text/javascript">',
+              '$("#' + station + '_startTime' + currentDay + '").timepicker({',
+              'defaultTime: false,',
+              'template: false,',
+              'showInputs: false,',
+              'minuteStep: 5',
+              '});',
+              '</script>',
               ''
             ].join('');
-
-            // need to set listener for duration so that users can't enter negative number
             var duration = ['<label for="'+ station + '_duration">Time: </label>',
               '<input id="'+ station + '_duration" ng-model="scheduleData.schedule.' + station+ '.' + currentDay+ '.' + 'duration" type="number" min="0" class="input-small">'
             ].join('');
             rowInject += '<td><div class="form-group>"' + startTime + duration + '</div></td>';
           }
           rowInject += "</tr>";
-          //debugger;
         }
         rowInject += "</tbody>";
         // $log.debug(rowInject);
@@ -78,7 +75,7 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
       // could use jQuery modal instead of alert
       $log.debug('Called saveSchedule, sending the schedule...');
       $log.debug($scope.scheduleData);
-
+      // TODO: POST schedule and timezone offset
       $http.post('api/schedule', $scope.scheduleData).then(
         function (response) {
           if(response.data.reply === 'Schedule saved') {

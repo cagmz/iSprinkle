@@ -16,7 +16,6 @@ def schedule():
         schedule_data = request.get_json()
         stations = schedule_data['schedule']
         success = iSprinkle.settings_handler.set_key('schedule', stations)
-
         post_reply = {}
         if success:        # if schedule was saved in object and written to disk
             post_reply['reply'] = 'Schedule saved'
