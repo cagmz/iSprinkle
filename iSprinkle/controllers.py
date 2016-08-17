@@ -15,10 +15,10 @@ def schedule():
         # schedule_data = {s0: {Monday: {}}, {Tuesday: {}}, etc}
         schedule_data = request.get_json()
         stations = schedule_data['schedule']
-        iSprinkle.settings_handler.set_key('schedule', stations)
+        iSprinkle.settings_handler.settings['schedule'] = stations
         post_reply = {}
         try:
-            iSprinkle.settings_handler.write_settings(iSprinkle.settings_handler.get_settings())
+            iSprinkle.settings_handler.write_settings(iSprinkle.settings_handler.settings)
             post_reply['reply'] = 'Schedule saved'
         except OSError:
             post_reply['reply'] = 'Error saving schedule: Abducted by aliens'

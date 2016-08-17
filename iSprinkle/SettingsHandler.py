@@ -13,7 +13,7 @@ class SettingsHandler(object):
         if os.path.isfile(settings_path):
             try:
                 with open(settings_path, 'r') as settings_file_handle:
-                    self.set_settings(json.load(settings_file_handle))
+                    self.settings = json.load(settings_file_handle)
                     print("SettingsHandler loaded existing settings file")
             except OSError:
                 raise OSError("SettingsHandler couldn't read settings file")
@@ -267,15 +267,8 @@ class SettingsHandler(object):
                     }
                 }
             }
-            self.set_settings(default_settings)
+            self.settings = default_settings
             self.write_settings(default_settings)
-
-    def set_settings(self, settings_json):
-        self.settings = settings_json
-        return True
-
-    def get_settings(self):
-        return self.settings
 
     def write_settings(self, settings_json):
         try:
@@ -286,17 +279,12 @@ class SettingsHandler(object):
             raise OSError("SettingsHandler couldn't write settings file")
 
     def get_schedule(self):
-        schedule = {'timezone_offset': self.get_key('timezone_offset'), 'schedule': self.get_key('schedule')}
+        schedule = {'timezone_offset': self.get_settings_key('timezone_offset'), 'schedule': self.get_settings_key('schedule')}
         print("StationHandler's getSchedule() was called")
         print(schedule)
         return schedule
 
-    # used to set the schedule from controllers.py
-    # eg self.settings['schedule'] = scheduleData['schedule']
-    def set_key(self, key, value):
-        self.settings[key] = value
-
-    def get_key(self, key):
+    def get_settings_key(self, key):
         try:
             return self.settings[key]
         except KeyError:
