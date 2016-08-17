@@ -7,7 +7,7 @@ ON, OFF = 1, 0
 class StationControl(object):
     def __init__(self, stations, settings_handler):
         self.num_stations = stations
-        self.user = settings_handler.get_key('user')
+        self.user = settings_handler.get_settings_key('user')
 
         # instead of separate station id and status, use a dictionary
         # use dictionary.length instead of num_stations
