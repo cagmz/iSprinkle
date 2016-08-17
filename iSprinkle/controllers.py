@@ -5,7 +5,7 @@ from flask import jsonify, request
 @app.route('/api/stations')
 def api():
     print("/api/stations hit")
-    return jsonify(stations=iSprinkle.station_control.get_stations())
+    return jsonify(stations=iSprinkle.station_control.num_stations)
 
 
 @app.route('/api/schedule', methods=['GET', 'POST'])

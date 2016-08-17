@@ -1,8 +1,6 @@
 from dateutil.parser import parse
 from dateutil.tz import tz
 
-ON, OFF = 1, 0
-
 
 class StationControl(object):
     def __init__(self, stations, settings_handler):
@@ -25,7 +23,7 @@ class StationControl(object):
 
     def reset_stations(self):
         for i in range(0, self.num_stations):
-            self.set_station(i, OFF)
+            self.set_station(i, False)
 
     def set_schedule(self, settings_json):
         # schedule dictionary:
@@ -35,29 +33,16 @@ class StationControl(object):
         for station in stations:
             for day in stations[station]:
                 time_str = stations[station][day]['start_time'] + " " + timezone_offset
-                # get 24 hour local time and and convert to UTC time for use internally
+                # get 12 hour local time and and convert to 24 hour UTC time for use internally
                 utc_time = string_to_utc(time_str)
                 watering_duration = int(stations[station][day]['duration'])
+                # print('{} starts at {} (UTC: {}) for {} min on {}'.format(station, time_str, utc_time, watering_duration, day))
                 self.schedule.setdefault((station, day), []).append((utc_time, watering_duration))
-            print("finished with {}".format(station))
+            # print("finished with {}".format(station))
         print("StationControl instantiated with stations: {} ".format(self.station_status))
-
-    def get_schedule(self):
-        return self.schedule
-
-    def get_settings(self):
-        return self.settings
-
-    def get_stations(self):
-        return self.num_stations
-
-    def get_user(self):
-        return self.user
 
 
 def string_to_utc(time_str):
     local_time = parse(time_str, fuzzy=True)
-    print("local time: {}".format(local_time))
     utc_time = local_time.astimezone(tz.tzutc())
-    print("utc time: {}".format(utc_time))
     return utc_time

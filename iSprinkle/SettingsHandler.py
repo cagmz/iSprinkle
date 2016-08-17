@@ -280,7 +280,6 @@ class SettingsHandler(object):
 
     def get_schedule(self):
         schedule = {'timezone_offset': self.get_settings_key('timezone_offset'), 'schedule': self.get_settings_key('schedule')}
-        print("StationHandler's getSchedule() was called")
         print(schedule)
         return schedule
 
