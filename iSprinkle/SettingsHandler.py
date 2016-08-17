@@ -1,11 +1,6 @@
 import os
 import json
 
-# test if an existing file loads
-# test if no file is present
-#   test update settings
-#   test load settings
-
 
 class SettingsHandler(object):
     def __init__(self, settings_path):
@@ -16,15 +11,14 @@ class SettingsHandler(object):
     # loads from filesystem
     def load_settings(self, settings_path):
         if os.path.isfile(settings_path):
-            # if settings file is in path, try to load it
             try:
                 with open(settings_path, 'r') as settings_file_handle:
                     self.set_settings(json.load(settings_file_handle))
-                    print("Loaded settings file")
+                    print("SettingsHandler loaded existing settings file")
             except OSError:
                 raise OSError("SettingsHandler couldn't read settings file")
         else:
-            # create default settings file
+            # create default settings file if one didn't exist
             print("Creating default settings file")
             # default timezone is -07:00
             default_settings = {
@@ -273,12 +267,12 @@ class SettingsHandler(object):
                     }
                 }
             }
-            self.write_settings(default_settings)
-            # use update_settings to save disk read
             self.set_settings(default_settings)
+            self.write_settings(default_settings)
 
     def set_settings(self, settings_json):
         self.settings = settings_json
+        return True
 
     def get_settings(self):
         return self.settings
@@ -287,6 +281,7 @@ class SettingsHandler(object):
         try:
             with open(self.settings_path, 'w') as settings_file_handle:
                 json.dump(settings_json, settings_file_handle)
+                return True
         except OSError:
             raise OSError("SettingsHandler couldn't write settings file")
 
@@ -300,7 +295,6 @@ class SettingsHandler(object):
     # eg self.settings['schedule'] = scheduleData['schedule']
     def set_key(self, key, value):
         self.settings[key] = value
-        return True
 
     def get_key(self, key):
         try:

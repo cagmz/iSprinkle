@@ -15,11 +15,12 @@ def schedule():
         # schedule_data = {s0: {Monday: {}}, {Tuesday: {}}, etc}
         schedule_data = request.get_json()
         stations = schedule_data['schedule']
-        success = iSprinkle.settings_handler.set_key('schedule', stations)
+        iSprinkle.settings_handler.set_key('schedule', stations)
         post_reply = {}
-        if success:        # if schedule was saved in object and written to disk
+        try:
+            iSprinkle.settings_handler.write_settings(iSprinkle.settings_handler.get_settings())
             post_reply['reply'] = 'Schedule saved'
-        else:
+        except OSError:
             post_reply['reply'] = 'Error saving schedule: Abducted by aliens'
         return jsonify(post_reply)
     elif request.method == 'GET':

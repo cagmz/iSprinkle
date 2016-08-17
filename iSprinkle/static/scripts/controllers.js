@@ -19,7 +19,7 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
         $scope.weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         // view uses tableHeader to create table heading
         $scope.tableHeader = ['Stations'].concat($scope.weekdays);
-        
+
         var rowInject = '<thead><tr><th ng-repeat="column in tableHeader">{{ column }}</th></tr></thead><tbody>';
         for (var station in $scope.scheduleData.schedule) {
           // $log.debug(station);
