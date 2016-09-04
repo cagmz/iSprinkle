@@ -92,6 +92,10 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
 
     };
 
+    $scope.timezone = function timezone() {
+      
+    }
+
 }]);
 
 iSprinkleApp.controller('ManualController',

@@ -5,7 +5,7 @@ app = Flask(__name__)
 from iSprinkle.StationControl import StationControl
 from iSprinkle.SettingsHandler import SettingsHandler
 
-import iSprinkle.views, sqlite3, os, json
+import iSprinkle.views, sqlite3, os, json, time
 
 # local dev path
 settings_file = '../data/settings.json'
@@ -30,11 +30,19 @@ def create_station_control():
     station_control = StationControl(MAX_STATIONS, settings_handler)
 
 
+def run_scheduler():
+    global station_control
+    print('Next job should run at {}'.format(str(station_control.watering_scheduler.next_run())))
+    #while True:
+    #    station_control.watering_scheduler.run_pending()
+    #    time.sleep(1)
+
 # Always run these
 def setup():
     try:
         create_settings_handler()
         create_station_control()
+        run_scheduler()
     except (RuntimeError, OSError) as e:
         print(e)
         # cleanup

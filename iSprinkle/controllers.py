@@ -18,7 +18,9 @@ def schedule():
         iSprinkle.settings_handler.settings['schedule'] = stations
         post_reply = {}
         try:
+            # Update schedule in StationControl and update watering_scheduler jobs
             iSprinkle.settings_handler.write_settings(iSprinkle.settings_handler.settings)
+            iSprinkle.station_control.set_schedule(iSprinkle.settings_handler.settings)
             post_reply['reply'] = 'Schedule saved'
         except OSError:
             post_reply['reply'] = 'Error saving schedule: Abducted by aliens'
