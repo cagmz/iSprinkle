@@ -1,5 +1,4 @@
-import schedule as job_scheduler
-import time # might not be needed
+from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.parser import parse
 from dateutil.tz import tz
 
@@ -19,7 +18,7 @@ class StationControl(object):
         # unparsed schedule is in SettingsHandler object
         self.schedule = {}
 
-        self.watering_scheduler = job_scheduler
+        self.watering_scheduler = BackgroundScheduler()
         self.set_schedule(settings_handler.get_schedule())
 
     def set_station(self, station, signal):
@@ -32,45 +31,50 @@ class StationControl(object):
     def set_schedule(self, settings_json):
         # schedule dictionary:
         # (key) = (value) => (station, day) = (datetime in utc, watering duration)
-        self.watering_scheduler.clear()
+
+        self.watering_scheduler.remove_all_jobs()
+
         stations = settings_json['schedule']
         timezone_offset = settings_json['timezone_offset']
         for station in stations:
             for day in stations[station]:
                 time_str = stations[station][day]['start_time'] + " " + timezone_offset
-                # get 12 hour local time and and convert to 24 hour UTC time for use internally
-                local_utc_time = timestr_to_utc(time_str)
-                watering_duration = int(stations[station][day]['duration'])
-                # print('{} starts at {} (UTC: {}) for {} min on {}'.format(station, time_str, local_utc_time, watering_duration, day))
-                self.schedule.setdefault((station, day), []).append((local_utc_time, watering_duration))
+                # get 12 hour time and convert to time-zone aware datetime object (24 hour UTC time) for use internally
+                utc_time = timestr_to_utc(time_str)
 
-                scheduler_time = timestr_to_utc(stations[station][day]['start_time'], False)
-                scheduler_time = scheduler_time.time().strftime('%H:%M')
+                duration = int(stations[station][day]['duration'])
 
-                # Reach into Schedule module and assign a reference to the right weekday job method
-                weekday_job = getattr(self.watering_scheduler.every(), day.lower())
-                # Pass watering method (along with params) to weekday job method
-                weekday_job.at(scheduler_time).do(water_plant, station, scheduler_time, watering_duration)
-
-            # print("finished with {}".format(station))
-        print("StationControl instantiated with stations: {} ".format(self.station_status))
-
-    def populate_job_scheduler(self):
-        pass
-        # scheduler_time = timestr_to_utc(stations[station][day]['start_time'])
-        # job_scheduler.next_run(scheduler_time)
+                # add all stations to the static schedule, but only add a watering job to the watering schedule
+                # if actually watering (duration > 0)
+                self.schedule.setdefault((station, day), []).append((utc_time, duration))
+                if duration > 0:
+                    self.watering_scheduler.add_job(water, 'date', run_date=utc_time, args=[station, time_str, duration])
+            print('Added water_schedule jobs for {}'.format(station))
+        # start the scheduler if it's not already running
+        if not self.watering_scheduler.state:
+            self.watering_scheduler.start()
 
 
-def water_plant(station='-1', scheduled_time='23:59', duration='-1'):
+def water(station='-1', scheduled_time='23:59', duration='-1'):
+    from datetime import datetime
+    import time
+    print('water(station={}, scheduled_time={}, duration={}), time_now = {}'.format(station, scheduled_time, duration, str(datetime.now())))
     print('Station {} watering a plant at {} for {} minutes'.format(station, scheduled_time, duration))
 
+    # activate solenoid
+    # todo: create a new (temp) scheduler to disable the solenoid
+    seconds = int(duration) * 60
+    while seconds > 0:
+        print('drip.... second {}'.format(seconds))
+        time.sleep(1)
+        seconds -= 1
+    print('Station {} finished watering'.format(station))
 
 def timestr_to_utc(time_str, local=True):
     '''
     Converts a time string to 24 hour time.
     If local=True, time_str should contain a timezone offset and the caller should expect a localized datetime.
     Else, time_str should not contain an offset, and the caller should expect a non-localized datetime.
-
     '''
     if local:
         local_time = parse(time_str, fuzzy=True)
