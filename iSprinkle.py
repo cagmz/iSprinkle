@@ -1,4 +1,3 @@
-#!/usr/bin/python
 from iSprinkle import app, setup
 
 # database = '/data/database.db'

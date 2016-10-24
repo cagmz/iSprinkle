@@ -1,7 +1,23 @@
-<!-- Debugging :) Use Devtools to select an element, then call ng() -->
-<script>function ng() {
-    return $('#scheduleTable').scope();
-}</script>
+<script>
+    /*
+     For Debugging: use to access current scope, including variables in controller
+     Use Chorme DevTools to select an element, then call ng().
+     Alternatively, run this in the console:
+     angular.element(document.getElementById("someElementInPage")).scope().someVariable
+     */
+    function ng() {
+        return $('#scheduleTable').scope();
+    }
+    function toggleWateringTimeForm() {
+        if (!$('#wateringTimeForm').is(':visible')) {
+            $('#addWateringTimeBtn').hide();
+            $('#wateringTimeForm').show();
+        } else {
+            $('#addWateringTimeBtn').show();
+            $('#wateringTimeForm').hide();
+        }
+    }
+</script>
 
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -12,9 +28,118 @@
     </div>
     <div ng-if="numberOfStations !== -1">
         <div class="panel-body">
-            <table id="scheduleTable" class="table table-bordered">
-                <!-- Rows are dynamically generated in the controller and compiled by Angular -->
-            </table>
+            <div id="wateringTimeInputContainer" style="padding: 10px;">
+                <button type="button" id="addWateringTimeBtn" class="btn btn-default"
+                        onclick="toggleWateringTimeForm()">
+                    Add Watering Time
+                </button>
+
+                <form class="form-horizontal" id="wateringTimeForm" style="padding: 10px; display: none;">
+                    <!-- Stations -->
+                    <div class="form-group row">
+                        <div class="input-group">
+                            <label>Stations</label>
+                            <select ng-model="stations" id="stationsSelectBox" multiple="multiple">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select>
+                            <script type="text/javascript">
+                                // can instantiate with available stations using data property
+                                $(document).ready(function () {
+                                    $("#stationsSelectBox").select2({
+                                        placeholder: "1"
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                    <!-- Duration -->
+                    <div class="form-group row">
+                        <label>for </label>
+                        <div class="input-group">
+                            <input ng-model="duration" type="text" type="range" class="form-control" placeholder="5">
+                            <span class="input-group-addon">minutes</span>
+                        </div>
+                    </div>
+                    <!-- Start Time -->
+
+
+                    <!-- Days -->
+                    <!-- Stations -->
+                    <div class="form-group row">
+                        <div class="input-group">
+                            <label>Days</label>
+                            <select ng-model="interval" id="daysSelectBox" multiple="multiple">
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                                <option value="odd days">odd days</option>
+                                <option value="even days">even days</option>
+                                <option value="every day">every day</option>
+                            </select>
+                            <script type="text/javascript">
+                                // can instantiate with available intervals using data property
+                                $(document).ready(function () {
+                                    $("#daysSelectBox").select2({
+                                        placeholder: "Monday"
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label>at </label>
+                        <div class="bootstrap-timepicker input-group">
+                            <input ng-model="startTime" id="startTimeInput" value="12:00 AM" type="text"
+                                   class="form-control">
+                            <i class="icon-time"></i>
+                        </div>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                $('#startTimeInput').timepicker({
+                                    defaultTime: '12:00 AM',
+                                    template: false,
+                                    showInputs: false,
+                                    minuteStep: 5
+                                });
+                            });
+                        </script>
+                    </div>
+
+
+                    <div class="form-group row">
+                        <div class="btn-toolbar">
+                            <button type="button" id="hideWateringTimeFormBtn"
+                                    class="btn btn-default"
+                                    onclick="toggleWateringTimeForm()">
+                                Cancel
+                            </button>
+                            <button type="button" id="submitWateringTimeBtn" class="btn btn-default"
+                                    ng-click="validateWateringTime(stations, duration, interval, startTime)">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="scheduleContainer">
+                <table id="scheduleTable" class="table table-bordered">
+                    <!-- Rows are dynamically generated in the controller and compiled by Angular -->
+                </table>
+            </div>
+
         </div>
         <div class="panel-footer clearfix">
             <div class="pull-right">

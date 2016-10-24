@@ -1,17 +1,19 @@
 body {
-  padding-top: 20px;
-  padding-bottom: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .navbar {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
-.input-small {
-  width: 65px;
+.schedule-cell .form-group {
+    margin-bottom: 0px;
 }
 
-label {
-  margin: 0px;
-  font-weight: normal;
+.schedule-cell input,
+.schedule-cell label {
+    margin: 0px;
+    font-weight: normal;
+    width: 75px;
 }

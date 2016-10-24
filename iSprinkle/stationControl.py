@@ -1,6 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.parser import parse
 from dateutil.tz import tz
+import datetime
 
 
 class StationControl(object):
@@ -38,17 +39,18 @@ class StationControl(object):
         timezone_offset = settings_json['timezone_offset']
         for station in stations:
             for day in stations[station]:
-                time_str = stations[station][day]['start_time'] + " " + timezone_offset
-                # get 12 hour time and convert to time-zone aware datetime object (24 hour UTC time) for use internally
-                utc_time = timestr_to_utc(time_str)
+                for start_time in stations[station][day]['start_times']:
+                    time_str = start_time['time'] + " " + timezone_offset
+                    # get 12 hour time and convert to time-zone aware datetime object (24 hour UTC time) for use internally
+                    utc_time = timestr_to_utc(time_str)
 
-                duration = int(stations[station][day]['duration'])
+                    duration = int(start_time['duration'])
 
-                # add all stations to the static schedule, but only add a watering job to the watering schedule
-                # if actually watering (duration > 0)
-                self.schedule.setdefault((station, day), []).append((utc_time, duration))
-                if duration > 0:
-                    self.watering_scheduler.add_job(water, 'date', run_date=utc_time, args=[station, time_str, duration])
+                    # add all stations to the static schedule, but only add a watering job to the watering schedule
+                    # if actually watering (duration > 0)
+                    self.schedule.setdefault((station, day), []).append((utc_time, duration))
+                    if duration > 0:
+                        self.watering_scheduler.add_job(water, 'date', run_date=utc_time, args=[station, time_str, duration])
             print('Added water_schedule jobs for {}'.format(station))
         # start the scheduler if it's not already running
         if not self.watering_scheduler.state:
@@ -56,13 +58,11 @@ class StationControl(object):
 
 
 def water(station='-1', scheduled_time='23:59', duration='-1'):
-    from datetime import datetime
     import time
-    print('water(station={}, scheduled_time={}, duration={}), time_now = {}'.format(station, scheduled_time, duration, str(datetime.now())))
-    print('Station {} watering a plant at {} for {} minutes'.format(station, scheduled_time, duration))
+    print('water(station={}, scheduled_time={}, duration={}), time_now = {}'.format(station, scheduled_time, duration, str(datetime.datetime.now())))
 
     # activate solenoid
-    # todo: create a new (temp) scheduler to disable the solenoid
+    # TODO: watering must be done serially. Enforce this constraint client-side
     seconds = int(duration) * 60
     while seconds > 0:
         print('drip.... second {}'.format(seconds))
@@ -70,12 +70,13 @@ def water(station='-1', scheduled_time='23:59', duration='-1'):
         seconds -= 1
     print('Station {} finished watering'.format(station))
 
+
 def timestr_to_utc(time_str, local=True):
-    '''
+    """
     Converts a time string to 24 hour time.
     If local=True, time_str should contain a timezone offset and the caller should expect a localized datetime.
     Else, time_str should not contain an offset, and the caller should expect a non-localized datetime.
-    '''
+    """
     if local:
         local_time = parse(time_str, fuzzy=True)
         utc_time = local_time.astimezone(tz.tzutc())

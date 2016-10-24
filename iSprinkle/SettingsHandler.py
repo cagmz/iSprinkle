@@ -26,244 +26,76 @@ class SettingsHandler(object):
                 "timezone_offset": "-07:00",
                 "schedule": {
                     "s0": {
-                        "Monday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Tuesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Wednesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Thursday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Friday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Saturday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Sunday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        }
+                        "Monday": {"start_times": []},
+                        "Tuesday": {"start_times": []},
+                        "Wednesday": {"start_times": []},
+                        "Thursday": {"start_times": []},
+                        "Friday": {"start_times": []},
+                        "Saturday": {"start_times": []},
+                        "Sunday": {"start_times": []}
                     },
                     "s1": {
-                        "Monday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Tuesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Wednesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Thursday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Friday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Saturday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Sunday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        }
+                        "Monday": {"start_times": []},
+                        "Tuesday": {"start_times": []},
+                        "Wednesday": {"start_times": []},
+                        "Thursday": {"start_times": []},
+                        "Friday": {"start_times": []},
+                        "Saturday": {"start_times": []},
+                        "Sunday": {"start_times": []}
                     },
                     "s2": {
-                        "Monday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Tuesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Wednesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Thursday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Friday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Saturday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Sunday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        }
+                        "Monday": {"start_times": []},
+                        "Tuesday": {"start_times": []},
+                        "Wednesday": {"start_times": []},
+                        "Thursday": {"start_times": []},
+                        "Friday": {"start_times": []},
+                        "Saturday": {"start_times": []},
+                        "Sunday": {"start_times": []}
                     },
                     "s3": {
-                        "Monday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Tuesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Wednesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Thursday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Friday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Saturday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Sunday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        }
+                        "Monday": {"start_times": []},
+                        "Tuesday": {"start_times": []},
+                        "Wednesday": {"start_times": []},
+                        "Thursday": {"start_times": []},
+                        "Friday": {"start_times": []},
+                        "Saturday": {"start_times": []},
+                        "Sunday": {"start_times": []}
                     },
                     "s4": {
-                        "Monday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Tuesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Wednesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Thursday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Friday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Saturday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Sunday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        }
+                        "Monday": {"start_times": []},
+                        "Tuesday": {"start_times": []},
+                        "Wednesday": {"start_times": []},
+                        "Thursday": {"start_times": []},
+                        "Friday": {"start_times": []},
+                        "Saturday": {"start_times": []},
+                        "Sunday": {"start_times": []}
                     },
                     "s5": {
-                        "Monday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Tuesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Wednesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Thursday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Friday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Saturday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Sunday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        }
+                        "Monday": {"start_times": []},
+                        "Tuesday": {"start_times": []},
+                        "Wednesday": {"start_times": []},
+                        "Thursday": {"start_times": []},
+                        "Friday": {"start_times": []},
+                        "Saturday": {"start_times": []},
+                        "Sunday": {"start_times": []}
                     },
                     "s6": {
-                        "Monday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Tuesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Wednesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Thursday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Friday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Saturday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Sunday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        }
+                        "Monday": {"start_times": []},
+                        "Tuesday": {"start_times": []},
+                        "Wednesday": {"start_times": []},
+                        "Thursday": {"start_times": []},
+                        "Friday": {"start_times": []},
+                        "Saturday": {"start_times": []},
+                        "Sunday": {"start_times": []}
                     },
                     "s7": {
-                        "Monday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Tuesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Wednesday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Thursday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Friday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Saturday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        },
-                        "Sunday": {
-                            "start_time": "12:00 AM",
-                            "duration": 0
-                        }
+                        "Monday": {"start_times": []},
+                        "Tuesday": {"start_times": []},
+                        "Wednesday": {"start_times": []},
+                        "Thursday": {"start_times": []},
+                        "Friday": {"start_times": []},
+                        "Saturday": {"start_times": []},
+                        "Sunday": {"start_times": []}
                     }
                 }
             }
@@ -279,7 +111,8 @@ class SettingsHandler(object):
             raise OSError("SettingsHandler couldn't write settings file")
 
     def get_schedule(self):
-        schedule = {'timezone_offset': self.get_settings_key('timezone_offset'), 'schedule': self.get_settings_key('schedule')}
+        schedule = {'timezone_offset': self.get_settings_key('timezone_offset'),
+                    'schedule': self.get_settings_key('schedule')}
         print(schedule)
         return schedule
 
