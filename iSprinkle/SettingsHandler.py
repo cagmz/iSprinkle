@@ -1,22 +1,28 @@
 import os
 import json
+import sqlite3
 
 
 class SettingsHandler(object):
-    def __init__(self, settings_path):
-        self.settings_path = settings_path
+    def __init__(self, root_path):
+        settings_file = '../data/settings.json'
+        self.settings_path = os.path.join(root_path, settings_file)
         self.settings = {}
-        self.load_settings(settings_path)
+        self.load_settings()
+
+        database_file = '../data/database.db'
+        self.database_path = os.path.join(root_path, database_file)
+        self.init_database()
 
     # loads from filesystem
-    def load_settings(self, settings_path):
-        if os.path.isfile(settings_path):
+    def load_settings(self):
+        if os.path.isfile(self.settings_path):
             try:
-                with open(settings_path, 'r') as settings_file_handle:
+                with open(self.settings_path, 'r') as settings_file_handle:
                     self.settings = json.load(settings_file_handle)
-                    print("SettingsHandler loaded existing settings file")
+                    print("Loaded existing settings file")
             except OSError:
-                raise OSError("SettingsHandler couldn't read settings file")
+                raise OSError("Couldn't read settings file")
         else:
             # create default settings file if one didn't exist
             print("Creating default settings file")
@@ -108,12 +114,11 @@ class SettingsHandler(object):
                 json.dump(settings_json, settings_file_handle)
                 return True
         except OSError:
-            raise OSError("SettingsHandler couldn't write settings file")
+            raise OSError("Couldn't write settings file")
 
     def get_schedule(self):
         schedule = {'timezone_offset': self.get_settings_key('timezone_offset'),
                     'schedule': self.get_settings_key('schedule')}
-        print(schedule)
         return schedule
 
     def get_settings_key(self, key):
@@ -121,3 +126,28 @@ class SettingsHandler(object):
             return self.settings[key]
         except KeyError:
             return "Error: key {} doesn't exist in the SettingsHandler settings".format(key)
+
+    def init_database(self):
+        if not os.path.isfile(self.database_path):
+            conn = sqlite3.connect(self.database_path)
+            conn.execute('''CREATE TABLE historical
+                (datetime TEXT PRIMARY KEY NOT NULL,
+                station INTEGER DEFAULT 0,
+                fixed_duration INTEGER DEFAULT 0,
+                forecasted_temp INTEGER DEFAULT 0,
+                base_temp INTEGER DEFAULT 0,
+                optimized_duration INTEGER DEFAULT 0,
+                manual INTEGER DEFAULT 0);''')
+            conn.commit()
+            conn.close()
+            print('Created new database')
+        else:
+            conn = sqlite3.connect(self.database_path)
+            curr = conn.cursor()
+            curr.execute('SELECT * FROM historical')
+            print('{}'.format([cn[0] for cn in curr.description]))
+            rows = curr.fetchall()
+            for r in rows:
+                print(r)
+
+            conn.close()

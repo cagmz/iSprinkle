@@ -8,16 +8,8 @@ from iSprinkle.SettingsHandler import SettingsHandler
 import iSprinkle.views
 import os
 
-# local dev path
-settings_file = '../data/settings.json'
-database_file = '../data/database.db'
-
 # cloud 9 path
 # settings_file = 'data/settings.json'
-
-print('approot path: {}'.format(app.root_path))
-settings_path = os.path.join(app.root_path, settings_file)
-database_path = os.path.join(app.root_path, database_file)
 
 station_control = None
 settings_handler = None
@@ -26,8 +18,8 @@ MAX_STATIONS = 8
 
 
 def create_settings_handler():
-    global settings_handler, settings_path
-    settings_handler = SettingsHandler(settings_path)
+    global settings_handler
+    settings_handler = SettingsHandler(app.root_path)
 
 
 def create_station_control():
