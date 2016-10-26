@@ -75,6 +75,11 @@ def timestr_to_utc(time_str, local=True):
     """
     Converts a time string to 24 hour time.
     If local=True, time_str should contain a timezone offset and the caller should expect a localized datetime.
+        eg  2016-10-25 07:00:00+00:00
+            year-mo-da 24hr:min:sec+timezone_offset
+    time_str can also contain dates
+        in: timestr_to_utc('1/1/16 12:00 AM -07:00')
+        out: 2016-01-01 07:00:00+00:00 (datetime)
     Else, time_str should not contain an offset, and the caller should expect a non-localized datetime.
     """
     if local:

@@ -5,15 +5,19 @@ app = Flask(__name__)
 from iSprinkle.StationControl import StationControl
 from iSprinkle.SettingsHandler import SettingsHandler
 
-import iSprinkle.views, sqlite3, os, json, time
+import iSprinkle.views
+import os
 
 # local dev path
 settings_file = '../data/settings.json'
+database_file = '../data/database.db'
 
 # cloud 9 path
 # settings_file = 'data/settings.json'
 
+print('approot path: {}'.format(app.root_path))
 settings_path = os.path.join(app.root_path, settings_file)
+database_path = os.path.join(app.root_path, database_file)
 
 station_control = None
 settings_handler = None
