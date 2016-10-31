@@ -3,16 +3,20 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
         // Call web api to retrieve and display historical data
 
         $scope.getUsageData = function (startDate, endDate, stations) {
-            if (!startDate) {
-                // http://momentjs.com/docs/#/customization/relative-time-rounding/
-                // can use relative time rounding to offer last-n days usage
-                // or use time subtraction: http://momentjs.com/docs/#/durations/subtract/
-                startDate = '1969-07-20 20:18:00+00:00';
-            }
+            // todo: change to ISO 8601... http://momentjs.com/docs/#/parsing/special-formats/
+            var internalDateFormat = "YYYY-MM-DD HH:mm:ssZ";
 
-            var todayUtc = moment.utc().format("YYYY-MM-DD HH:mm:ssZ");
-            if (!endDate) {
-                endDate = todayUtc;
+            if (startDate && endDate) {
+                startDate = moment(startDate).utc().format(internalDateFormat);
+                endDate = moment(endDate).utc().format(internalDateFormat);
+            } else {
+                if (!startDate) {
+                    startDate = '1969-07-20 20:18:00+00:00';
+                }
+                if(!endDate) {
+                    // set end date to today
+                    endDate = moment.utc().format(internalDateFormat);
+                }
             }
 
             if (!stations) {
@@ -40,6 +44,7 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
                     $log.debug('stations');
                     $log.debug(stations);
                     */
+
                     $scope.usageData = response.data;
                     $log.debug('Got data, processing for plotting...');
                     $log.debug($scope.usageData);
@@ -98,7 +103,7 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
                     bottom: 40,
                     left: 75
                 },
-                noData: "Please select a Usage type",
+                noData: "Please select a date range.",
                 x: function (d) {
                     /*
                      x axis values (dates) must be converted to UTC milliseconds
@@ -148,21 +153,15 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
             },
             caption: {
                 enable: false,
-                html: '<b>Figure 1.</b> Lorem ipsum dolor sit amet, at eam blandit sadipscing, ' +
-                '<span style="text-decoration: underline;">vim adhuc sanctus disputando ex</span>, ' +
-                'cu usu affert alienum urbanitas. <i>Cum in purto erat, mea ne nominavi persecuti reformidans.</i> ' +
-                'Docendi blandit abhorreant ea has, minim tantas alterum pro eu. <span style="color: darkred;">' +
-                'Exerci graeci ad vix, elit tacimates ea duo</span>. Id mel eruditi fuisset. Stet vidit patrioque ' +
-                'in pro, eum ex veri verterem abhorreant, id unum oportere intellegam nec<sup>[1, ' +
-                '<a href="https://github.com/krispo/angular-nvd3" target="_blank">2</a>, 3]</sup>.',
+                html: '',
                 css: {
-                    'text-align': 'justify',
+                    'text-align': 'center',
                     'margin': '10px 13px 0px 7px'
                 }
             }
         };
 
-        // $scope.data = [{ "key": "",  "values": [] }];
+        $scope.data = [{"key": "", "values": []}];
 
     }]);
 

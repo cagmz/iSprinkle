@@ -21,3 +21,12 @@ body {
 .select2-container {
     display: inline;
 }
+
+#usageGraphSelection {
+    text-align: center;
+    margin: 10px 13px 0px 7px
+}
+
+#showUsageGraphBtn {
+    margin: 10px;
+}
