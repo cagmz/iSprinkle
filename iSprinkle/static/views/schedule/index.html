@@ -21,7 +21,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Schedule Panel</h3>
+        <h3 class="panel-title">Schedule</h3>
     </div>
     <div ng-if="numberOfStations === -1" class="panel-body">
         <div>Error: Unable to contact Web API</div>
@@ -35,72 +35,63 @@
                 </button>
 
                 <form class="form-horizontal" id="wateringTimeForm" style="padding: 10px; display: none;">
+
                     <!-- Stations -->
                     <div class="form-group row">
-                        <div class="input-group">
-                            <label>Stations</label>
-                            <select ng-model="stations" id="stationsSelectBox" multiple="multiple">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                            </select>
-                            <script type="text/javascript">
-                                // can instantiate with available stations using data property
-                                $(document).ready(function () {
-                                    $("#stationsSelectBox").select2({
-                                        placeholder: "1"
-                                    });
+                        <label for="stationsSelectBox">Stations</label>
+                        <select class="col-md-8" ng-model="stations" id="stationsSelectBox" multiple>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                        </select>
+                        <script type="text/javascript">
+                            // can instantiate with available stations using data property
+                            $(document).ready(function () {
+                                $("#stationsSelectBox").select2({
+                                    placeholder: "1"
                                 });
-                            </script>
-                        </div>
+                            });
+                        </script>
                     </div>
                     <!-- Duration -->
                     <div class="form-group row">
-                        <label>for </label>
-                        <div class="input-group">
-                            <input ng-model="duration" type="text" type="range" class="form-control" placeholder="5">
-                            <span class="input-group-addon">minutes</span>
-                        </div>
+                        <label for="minutesTextbox">Minutes</label>
+                        <input ng-model="duration" id="minutesTextbox" class="form-control" type="number"  min="0"
+                               placeholder="5">
+                    </div>
+                    <!-- Days -->
+                    <div class="form-group row">
+                        <label for="daysSelectBox">Days</label>
+                        <select ng-model="interval" id="daysSelectBox" multiple="multiple">
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                            <option value="odd days">odd days</option>
+                            <option value="even days">even days</option>
+                            <option value="every day">every day</option>
+                        </select>
+                        <script type="text/javascript">
+                            // can instantiate with available intervals using data property
+                            $(document).ready(function () {
+                                $("#daysSelectBox").select2({
+                                    placeholder: "Monday"
+                                });
+                            });
+                        </script>
                     </div>
                     <!-- Start Time -->
-
-
-                    <!-- Days -->
-                    <!-- Stations -->
                     <div class="form-group row">
-                        <div class="input-group">
-                            <label>Days</label>
-                            <select ng-model="interval" id="daysSelectBox" multiple="multiple">
-                                <option value="Monday">Monday</option>
-                                <option value="Tuesday">Tuesday</option>
-                                <option value="Wednesday">Wednesday</option>
-                                <option value="Thursday">Thursday</option>
-                                <option value="Friday">Friday</option>
-                                <option value="Saturday">Saturday</option>
-                                <option value="Sunday">Sunday</option>
-                                <option value="odd days">odd days</option>
-                                <option value="even days">even days</option>
-                                <option value="every day">every day</option>
-                            </select>
-                            <script type="text/javascript">
-                                // can instantiate with available intervals using data property
-                                $(document).ready(function () {
-                                    $("#daysSelectBox").select2({
-                                        placeholder: "Monday"
-                                    });
-                                });
-                            </script>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label>at </label>
-                        <div class="bootstrap-timepicker input-group">
+                        <label for="startTimeInput">Start time:</label>
+                        <div class="bootstrap-timepicker">
                             <input ng-model="startTime" id="startTimeInput" value="12:00 AM" type="text"
                                    class="form-control">
                             <i class="icon-time"></i>
@@ -117,7 +108,6 @@
                         </script>
                     </div>
 
-
                     <div class="form-group row">
                         <div class="btn-toolbar">
                             <button type="button" id="hideWateringTimeFormBtn"
@@ -131,6 +121,7 @@
                             </button>
                         </div>
                     </div>
+
                 </form>
             </div>
 

@@ -1,12 +1,36 @@
+<script>
+    /*
+     For Debugging: use to access current scope, including variables in controller
+     Use Chorme DevTools to select an element, then call ng().
+     Alternatively, run this in the console:
+     angular.element(document.getElementById("someElementInPage")).scope().someVariable
+     */
+    function ng() {
+        // TODO: change this selector
+        return $('#showUsageGraphBtn').scope();
+    }
+    function toggleGraph() {
+        if (!$('#usageGraph').is(':visible')) {
+            //$('#showUsageGraphBtn').hide();
+            $('#usageGraph').show();
+        } else {
+            //$('#showUsageGraphBtn').show();
+            $('#usageGraph').hide();
+        }
+    }
+</script>
+
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Dashboard Panel</h3>
+        <h3 class="panel-title">Dashboard</h3>
     </div>
     <div class="panel-body">
-        {{ helloWorld }}
+        <button type="button" id="showUsageGraphBtn" class="btn btn-default"
+                ng-click="getUsageData(startDate, endDate, stations)">
+            Show Usage
+        </button>
 
-  <nvd3 options="options" data="data">
-  </nvd3><br><br>
-
+        <nvd3 id="usageGraph" options="options" data="data" style=""></nvd3>
+        <br><br>
     </div>
-</div> <!-- /DashboardController div -->
+</div> <!-- /HomeController div -->

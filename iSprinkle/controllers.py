@@ -1,10 +1,9 @@
 from iSprinkle import *
 from flask import jsonify, request
-
+import datetime
 
 @app.route('/api/stations')
-def api():
-    print("/api/stations hit")
+def stations():
     return jsonify(stations=iSprinkle.station_control.num_stations)
 
 
@@ -28,3 +27,19 @@ def schedule():
     elif request.method == 'GET':
         station_schedules = iSprinkle.settings_handler.get_schedule()
         return jsonify(station_schedules)
+
+
+@app.route('/api/usage', methods=['GET'])
+def usage():
+    start_date = request.args.get('startDate')
+    end_date = request.args.get('endDate')
+    requested_stations = request.args.get('stations').split(',')
+    records = iSprinkle.settings_handler.usage(start_date, end_date, requested_stations)
+    # todo: Preprocess records so that return is:
+    # a dictionary with [date in utc milliseconds] -> array of rows on that day\
+
+    # for record in records:
+    #     record = list(record)
+    #     record[0] = record[0][:10]
+
+    return jsonify(records)

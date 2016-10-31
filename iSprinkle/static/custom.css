@@ -17,3 +17,7 @@ body {
     font-weight: normal;
     width: 75px;
 }
+
+.select2-container {
+    display: inline;
+}

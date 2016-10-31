@@ -1,21 +1,111 @@
-iSprinkleApp.controller('HomeController',
-    function DashboardController($scope) {
-        // Dashboard
+iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFactory',
+    function HomeController($scope, $http, $log, StationFactory) {
         // Call web api to retrieve and display historical data
-        $scope.helloWorld = "HomeController";
 
+        $scope.getUsageData = function (startDate, endDate, stations) {
+            if (!startDate) {
+                // http://momentjs.com/docs/#/customization/relative-time-rounding/
+                // can use relative time rounding to offer last-n days usage
+                // or use time subtraction: http://momentjs.com/docs/#/durations/subtract/
+                startDate = '1969-07-20 20:18:00+00:00';
+            }
+
+            var todayUtc = moment.utc().format("YYYY-MM-DD HH:mm:ssZ");
+            if (!endDate) {
+                endDate = todayUtc;
+            }
+
+            if (!stations) {
+                StationFactory.getNumberOfStations().then(function (response) {
+                    var numberOfStations = response.data.stations;
+                    stations = '';
+                    for (var i = 1; i < numberOfStations; i++) {
+                        stations += i + ',';
+                    }
+                    stations += numberOfStations;
+                    $scope.makeUsageRequest(startDate, endDate, stations);
+                }, function (error) {
+                    window.alert('Error getting number of stations.');
+                });
+            }
+
+            $scope.makeUsageRequest = function (startDate, endDate, stations) {
+                StationFactory.getUsage(startDate, endDate, stations).then(function (response) {
+                    /*
+                    $log.debug('In makeUsageRequest()');
+                    $log.debug('startDate');
+                    $log.debug(startDate);
+                    $log.debug('endDate');
+                    $log.debug(endDate);
+                    $log.debug('stations');
+                    $log.debug(stations);
+                    */
+                    $scope.usageData = response.data;
+                    $log.debug('Got data, processing for plotting...');
+                    $log.debug($scope.usageData);
+                    $scope.data = $scope.processUsageData($scope.usageData)
+                }, function (error) {
+                    window.alert('Error getting usage data');
+                })
+            };
+
+
+            $scope.processUsageData = function () {
+                /*
+                 Usage data contains an array of watering data from startDate to endDate
+                 [date, stationId, fixedDuration, forecastTemp, baseTemp, optimizedDuration, manual]
+                 This function should return an array of plottable object where:
+                 {x = date,
+                 y = cumulative watering time of all stations that day and of previous days}
+                 */
+
+                var fixed_watering = [];
+                var optimized_watering = [];
+                var sum_fixed = 0;
+                var sum_optimized = 0;
+
+                for (var i = 0; i < $scope.usageData.length; i++) {
+                    sum_fixed += $scope.usageData[i][2];
+                    sum_optimized += $scope.usageData[i][5];
+                    var plot_fixed = {x: $scope.usageData[i][0], y: sum_fixed};
+                    fixed_watering.push(plot_fixed);
+                    var plot_opt = {x: $scope.usageData[i][0], y: sum_optimized};
+                    optimized_watering.push(plot_opt);
+                }
+
+                // $log.debug('fixed:');
+                // $log.debug(fixed_watering);
+                // $log.debug('opt:');
+                // $log.debug(optimized_watering);
+
+                return [{values: fixed_watering, key: 'Fixed', color: '#1b75ba'},
+                    {values: optimized_watering, key: 'Optimized', color: '#26a874'}];
+            };
+
+        };
+
+        /*
+         * Options such as y-axis ticks should be set dynamically based on the # on the type of usage report requested.
+         * Eg in a weekly report, report minutes (instead of hours)
+         * */
         $scope.options = {
             chart: {
                 type: 'lineChart',
                 height: 450,
                 margin: {
                     top: 20,
-                    right: 20,
+                    right: 75,
                     bottom: 40,
-                    left: 55
+                    left: 75
                 },
+                noData: "Please select a Usage type",
                 x: function (d) {
-                    return d.x;
+                    /*
+                     x axis values (dates) must be converted to UTC milliseconds
+                     so d3 can use them
+                     "2016-04-04 07:00:00+00:00" -> 1459753200000
+                     */
+                    return moment.utc(d.x).valueOf();
                 },
                 y: function (d) {
                     return d.y;
@@ -36,33 +126,28 @@ iSprinkleApp.controller('HomeController',
                     }
                 },
                 xAxis: {
-                    axisLabel: 'Time (ms)'
+                    axisLabel: 'Date',
+                    tickFormat: (function (d) {
+                        return d3.time.format('%-m/%-d/%-Y')(new Date(d));
+                    })
                 },
                 yAxis: {
-                    axisLabel: 'Voltage (v)',
-                    tickFormat: function (d) {
-                        return d3.format('.02f')(d);
-                    },
-                    axisLabelDistance: -10
+                    axisLabel: 'Watering Time (Hours)',
+                    tickFormat: (function (d) {
+                        // convert minutes to hours for better scaling
+                        return Math.trunc(d / 60);
+                    })
                 },
                 callback: function (chart) {
-                    // console.log("!!! lineChart callback !!!");
+                    $log.debug('It\'s aliiive!!');
                 }
             },
             title: {
                 enable: true,
-                text: 'Title for Line Chart'
-            },
-            subtitle: {
-                enable: true,
-                text: 'Subtitle for simple line chart. Lorem ipsum dolor sit amet, at eam blandit sadipscing, vim adhuc sanctus disputando ex, cu usu affert alienum urbanitas.',
-                css: {
-                    'text-align': 'center',
-                    'margin': '10px 13px 0px 7px'
-                }
+                text: 'Watering Usage'
             },
             caption: {
-                enable: true,
+                enable: false,
                 html: '<b>Figure 1.</b> Lorem ipsum dolor sit amet, at eam blandit sadipscing, ' +
                 '<span style="text-decoration: underline;">vim adhuc sanctus disputando ex</span>, ' +
                 'cu usu affert alienum urbanitas. <i>Cum in purto erat, mea ne nominavi persecuti reformidans.</i> ' +
@@ -77,45 +162,9 @@ iSprinkleApp.controller('HomeController',
             }
         };
 
-        $scope.data = sinAndCos();
+        // $scope.data = [{ "key": "",  "values": [] }];
 
-        /*Random Data Generator */
-
-        function sinAndCos() {
-            var sin = [], sin2 = [],
-                cos = [];
-
-            //Data is represented as an array of {x,y} pairs.
-            for (var i = 0; i < 100; i++) {
-                sin.push({x: i, y: Math.sin(i / 10)});
-                sin2.push({x: i, y: i % 10 == 5 ? null : Math.sin(i / 10) * 0.25 + 0.5});
-                cos.push({x: i, y: .5 * Math.cos(i / 10 + 2) + Math.random() / 10});
-            }
-
-            //Line chart data should be sent as an array of series objects.
-            return [
-                {
-                    values: sin,      //values - represents the array of {x,y} data points
-                    key: 'Sine Wave', //key  - the name of the series.
-                    color: '#ff7f0e',  //color - optional: choose your own line color.
-                    strokeWidth: 2,
-                    classed: 'dashed'
-                },
-                {
-                    values: cos,
-                    key: 'Cosine Wave',
-                    color: '#2ca02c'
-                },
-                {
-                    values: sin2,
-                    key: 'Another sine wave',
-                    color: '#7777ff',
-                    area: true      //area - set to true if you want this line to turn into a filled area chart.
-                }
-            ];
-        };
-
-    });
+    }]);
 
 iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$compile', 'StationFactory',
     function ScheduleController($scope, $http, $log, $compile, StationFactory) {
@@ -130,7 +179,7 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
                 $scope.scheduleData = response.data;
                 $log.debug($scope.scheduleData.schedule);
 
-                // view uses tableHeader to create table heading
+                // view uses tableHeader to create table heading dynamically
                 $scope.tableHeader = ['Stations'].concat($scope.weekdays);
 
                 var rowInject = '<thead><tr><th ng-repeat="column in tableHeader">{{ column }}</th></tr></thead><tbody>';

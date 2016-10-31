@@ -1,7 +1,7 @@
 import os
 import json
 import sqlite3
-
+from dateutil import rrule, parser
 
 class SettingsHandler(object):
     def __init__(self, root_path):
@@ -143,11 +143,14 @@ class SettingsHandler(object):
             print('Created new database')
         else:
             conn = sqlite3.connect(self.database_path)
-            curr = conn.cursor()
-            curr.execute('SELECT * FROM historical')
-            print('{}'.format([cn[0] for cn in curr.description]))
-            rows = curr.fetchall()
-            for r in rows:
-                print(r)
-
+            print('Loaded existing database')
             conn.close()
+
+    def usage(self, start_date, end_date, stations):
+        # TODO: build compound WHERE clause to include stations
+        conn = sqlite3.connect(self.database_path)
+        curr = conn.cursor()
+        curr.execute('SELECT * FROM historical WHERE (datetime BETWEEN ? AND ?)', (start_date, end_date))
+        rows = curr.fetchall()
+        conn.close()
+        return rows
