@@ -1,4 +1,3 @@
-#!/usr/bin/python
 from flask import Flask, g
 
 app = Flask(__name__)
@@ -7,9 +6,6 @@ from iSprinkle.SettingsHandler import SettingsHandler
 
 import iSprinkle.views
 import os
-
-# cloud 9 path
-# settings_file = 'data/settings.json'
 
 station_control = None
 settings_handler = None
