@@ -3,9 +3,6 @@ venv
 
 .idea
 
-# settings file
-data
-
 rsync.txt
 
 *.pyc
