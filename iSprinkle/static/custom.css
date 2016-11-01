@@ -30,3 +30,7 @@ body {
 #showUsageGraphBtn {
     margin: 10px;
 }
+
+#adminStatusContainer .input-group {
+    margin-bottom: 10px;
+}

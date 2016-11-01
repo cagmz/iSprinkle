@@ -35,14 +35,20 @@
                 </table>
             </div>
 
+
             <div class="panel panel-default" id="wateringTimeInputContainer">
-                <div class="panel-heading">Add Watering Time</div>
-                <div class="panel-body">
-                    <button type="button" id="addWateringTimeBtn" class="btn btn-default"
+                <div class="panel-heading">
+                    <h3 class="panel-title pull-left">
+                        Add Watering Time
+                    </h3>
+
+                    <button type="button" id="addWateringTimeBtn" class="btn btn-default pull-right"
                             onclick="toggleWateringTimeForm()">
                         New
                     </button>
-
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-body">
                     <form class="form-horizontal" id="wateringTimeForm" style="padding: 10px; display: none;">
                         <!-- Stations -->
                         <div class="form-group row">
@@ -133,7 +139,6 @@
                     </form>
                 </div>
             </div>
-
         </div>
         <div class="panel-footer clearfix">
             <div class="pull-right">

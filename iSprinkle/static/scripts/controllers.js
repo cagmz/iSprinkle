@@ -13,7 +13,7 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
                 if (!startDate) {
                     startDate = '1969-07-20 20:18:00+00:00';
                 }
-                if(!endDate) {
+                if (!endDate) {
                     // set end date to today
                     endDate = moment.utc().format(internalDateFormat);
                 }
@@ -36,14 +36,14 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
             $scope.makeUsageRequest = function (startDate, endDate, stations) {
                 StationFactory.getUsage(startDate, endDate, stations).then(function (response) {
                     /*
-                    $log.debug('In makeUsageRequest()');
-                    $log.debug('startDate');
-                    $log.debug(startDate);
-                    $log.debug('endDate');
-                    $log.debug(endDate);
-                    $log.debug('stations');
-                    $log.debug(stations);
-                    */
+                     $log.debug('In makeUsageRequest()');
+                     $log.debug('startDate');
+                     $log.debug(startDate);
+                     $log.debug('endDate');
+                     $log.debug(endDate);
+                     $log.debug('stations');
+                     $log.debug(stations);
+                     */
 
                     $scope.usageData = response.data;
                     $log.debug('Got data, processing for plotting...');
@@ -204,7 +204,7 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
                             var time = ['<label for="' + station + '_' + currentDay + '_startTime_' + start_time + '">Start:</label>',
                                 '<input id="' + station + '_' + currentDay + '_startTime_' + start_time + '" ' +
                                 'ng-model="scheduleData.schedule.' + station + '.' + currentDay + '.start_times[' + start_time + '].time' + '" ' +
-                                'type="text" class="input-small">'].join('');
+                                'type="text" class="input-small"><br>'].join('');
                             var duration = ['<label for="' + station + '_' + currentDay + '_duration_' + start_time + '">Time: </label>',
                                 '<input id="' + station + '_' + currentDay + '_duration_' + start_time + '" ng-model="scheduleData.schedule.'
                                 + station + '.' + currentDay + '.start_times[' + start_time + '].duration' + '" ' + 'type="number" min="0" class="input-small">'
@@ -349,10 +349,6 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
             $scope.saveSchedule();
         };
 
-        $scope.timezone = function timezone() {
-            // this function should be used to set the timezone before POSTing the schedule object to the server
-        };
-
     }]);
 
 iSprinkleApp.controller('ManualController',
@@ -360,7 +356,27 @@ iSprinkleApp.controller('ManualController',
         $scope.helloWorld = "ManualController";
     });
 
-iSprinkleApp.controller('AdminController',
-    function AdminController($scope) {
-        $scope.helloWorld = "AdminController";
-    });
+iSprinkleApp.controller('AdminController', ['$scope', '$http', '$log', 'StationFactory',
+    function AdminController($scope, $http, $log, StationFactory) {
+
+        $scope.ip = 'Error finding LAN IP.';
+        $scope.uptime = 'Error finding uptime.';
+
+        $scope.refreshStatus = function refreshStatus() {
+            StationFactory.getLanIP().then(
+                function (response) {
+                    $scope.ip = response.data;
+                }, errorCallback);
+            StationFactory.getUptime().then(
+                function (response) {
+                    $scope.uptime = response.data;
+                }, errorCallback);
+        };
+
+        function errorCallback(err) {
+            err === undefined ? window.alert('Error refreshing ' + err + '.') : window.alert(err);
+        }
+
+        $scope.refreshStatus();
+
+    }]);
