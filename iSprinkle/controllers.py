@@ -2,6 +2,7 @@ from iSprinkle import *
 from flask import jsonify, request
 import datetime
 
+
 @app.route('/api/stations')
 def stations():
     return jsonify(stations=iSprinkle.station_control.num_stations)
@@ -43,3 +44,18 @@ def usage():
     #     record[0] = record[0][:10]
 
     return jsonify(records)
+
+
+@app.route('/api/rpi/ip', methods=['GET'])
+def lan():
+    return jsonify(iSprinkle.utils.get_lan_ip())
+
+
+@app.route('/api/rpi/restart', methods=['GET'])
+def restart():
+    return 'Rebooting'
+
+
+@app.route('/api/rpi/uptime', methods=['GET'])
+def reboot():
+    return jsonify(iSprinkle.utils.uptime())

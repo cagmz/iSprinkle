@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, g
 
 app = Flask(__name__)
@@ -5,7 +7,7 @@ from iSprinkle.StationControl import StationControl
 from iSprinkle.SettingsHandler import SettingsHandler
 
 import iSprinkle.views
-import os
+import iSprinkle.utils
 
 station_control = None
 settings_handler = None

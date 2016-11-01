@@ -1,8 +1,25 @@
 <div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">Administration</h3>
-  </div>
-  <div class="panel-body">
-    {{helloWorld}}
-  </div>
+    <div class="panel-heading">
+        <h3 class="panel-title">Administration</h3>
+    </div>
+    <div class="panel-body">
+
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">LAN IP</span>
+            <input type="text" class="form-control" ng-value="ip">
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">Uptime</span>
+            <input type="text" class="form-control" ng-value="uptime">
+        </div>
+
+
+        <div class="btn-toolbar">
+            <button type="button" id="refreshAdmin" class="btn btn-default"
+                    ng-click="refreshAdmin()">
+                Refresh
+            </button>
+        </div>
+    </div>
 </div> <!-- /AdminController div -->
