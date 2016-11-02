@@ -171,12 +171,12 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
         // wait until content is loaded before initializing inputs
         $scope.$on('$viewContentLoaded', function () {
             $timeout(function () {
-                $('.wateringTimeInputContainer').ready(function () {
-                    $(".selectpicker").selectpicker({
+                $('.scheduleContainer').ready(function () {
+                    $('.selectpicker').selectpicker({
                         style: 'btn-default',
                         noneSelectedText: 'None selected'
                     });
-                    $("#startTimeInput").timepicker({
+                    $('#startTimeInput').timepicker({
                         defaultTime: '12:00 AM',
                         template: false,
                         showInputs: false,
@@ -387,11 +387,11 @@ iSprinkleApp.controller('ManualController', ['$scope', '$http', '$log', '$route'
 
         // can populate with user's 'active' stations instead
         $scope.stations = [];
-        // use numberOfStations as sentinel for displaying error if unable to contact api
+        // use numberOfStations as sentinel for displaying error in UI if unable to contact api
         $scope.numberOfStations = -1;
         StationFactory.getNumberOfStations().then(function (response) {
             $scope.numberOfStations = response.data.stations;
-            for(var i = 0; i < $scope.numberOfStations; i++) {
+            for (var i = 0; i < $scope.numberOfStations; i++) {
                 var stationObject = {'id': (i + 1), 'duration': 0};
                 $scope.stations.push(stationObject);
             }

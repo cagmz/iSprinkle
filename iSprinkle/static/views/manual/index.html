@@ -8,20 +8,24 @@
                 <form class="form-horizontal" id="manualWateringInput" style="padding: 10px">
 
                     <div ng-repeat="station in stations" class="form-group row">
-                        <label>Station {{ station.id }}</label>
-                        <!-- use ng-if on duration. if > 0, display progress bar -->
-                        <input ng-model="station.duration" class="form-control" type="number" min="0" placeholder="0">
-                    </div>
+                        <label class="form-control-static col-xs-2">Station {{ station.id }}</label>
 
-                    <div class="form-group row">
-                        <div class="btn-toolbar">
-                            <button type="button" id="startManualWaterBtn" class="btn btn-default"
-                                    ng-click="validateManualWatering()">
-                                Start
-                            </button>
+                        <!-- use ng-if on duration. if > 0, display progress bar -->
+                        <div class="col-xs-8 input-group">
+                            <input ng-model="station.duration" class="form-control col-xs-8" type="number" min="0"
+                                   placeholder="0">
+                            <div class="input-group-addon">minutes</div>
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+                <button type="button" id="startManualWaterBtn" class="btn btn-default"
+                        ng-click="validateManualWatering()">
+                    Start
+                </button>
             </div>
         </div>
     </div>
