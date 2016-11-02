@@ -7,21 +7,6 @@ body {
     margin-bottom: 20px;
 }
 
-.schedule-cell .form-group {
-    margin-bottom: 0px;
-}
-
-.schedule-cell input,
-.schedule-cell label {
-    margin: 0px;
-    font-weight: normal;
-    width: 75px;
-}
-
-.select2-container {
-    display: inline;
-}
-
 #usageGraphSelection {
     text-align: center;
     margin: 10px 13px 0px 7px
@@ -33,4 +18,19 @@ body {
 
 #adminStatusContainer .input-group {
     margin-bottom: 10px;
+}
+
+.schedule-cell .form-group {
+    margin-bottom: 0px;
+}
+
+.schedule-cell input,
+.schedule-cell label {
+    margin: 0px;
+    font-weight: normal;
+    width: 75px;
+}
+
+#wateringTimeInputContainer {
+    display: none;
 }

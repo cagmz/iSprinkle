@@ -385,12 +385,22 @@ iSprinkleApp.controller('ManualController', ['$scope', '$http', '$log', '$route'
             });
         });
 
-        $scope.validateManualWatering = function validateManualWatering(stations, duration) {
+        // can populate with user's 'active' stations instead
+        $scope.stations = [];
+        // use numberOfStations as sentinel for displaying error if unable to contact api
+        $scope.numberOfStations = -1;
+        StationFactory.getNumberOfStations().then(function (response) {
+            $scope.numberOfStations = response.data.stations;
+            for(var i = 0; i < $scope.numberOfStations; i++) {
+                var stationObject = {'id': (i + 1), 'duration': 0};
+                $scope.stations.push(stationObject);
+            }
+        });
 
-            $log.debug('stations:');
-            $log.debug(stations);
-            $log.debug('Duration:');
-            $log.debug(duration);
+        $scope.validateManualWatering = function validateManualWatering() {
+
+            $log.debug('Manual input object');
+            $log.debug($scope.stations);
 
             // use $route to force reload page after validating input and starting manual watering
 

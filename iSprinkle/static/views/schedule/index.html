@@ -9,12 +9,12 @@
         return $('#scheduleTable').scope();
     }
     function toggleWateringTimeForm() {
-        if (!$('#wateringTimeForm').is(':visible')) {
+        if (!$('#wateringTimeInputContainer').is(':visible')) {
             $('#addWateringTimeBtn').hide();
-            $('#wateringTimeForm').show();
+            $('#wateringTimeInputContainer').show();
         } else {
             $('#addWateringTimeBtn').show();
-            $('#wateringTimeForm').hide();
+            $('#wateringTimeInputContainer').hide();
         }
     }
 </script>
@@ -35,17 +35,16 @@
                 </table>
             </div>
 
+            <button type="button" id="addWateringTimeBtn" class="btn btn-default"
+                    onclick="toggleWateringTimeForm()">
+                Add Watering Time
+            </button>
+
             <div class="panel panel-default" id="wateringTimeInputContainer">
                 <div class="panel-heading">
-                    <h3 class="panel-title pull-left">
+                    <h4 class="panel-title">
                         Add Watering Time
-                    </h3>
-
-                    <button type="button" id="addWateringTimeBtn" class="btn btn-default pull-right"
-                            onclick="toggleWateringTimeForm()">
-                        New
-                    </button>
-                    <div class="clearfix"></div>
+                    </h4>
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal" id="wateringTimeForm" style="padding: 10px">
@@ -119,7 +118,7 @@
         </div>
         <div class="panel-footer clearfix">
             <div class="pull-right">
-                <a ng-click="saveSchedule()" id="saveScheduleBtn" class="btn btn-default">Save</a>
+                <a ng-click="saveSchedule()" id="saveScheduleBtn" class="btn btn-default" data-loading-text="Saving...">Save</a>
             </div>
         </div>
     </div>

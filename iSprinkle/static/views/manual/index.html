@@ -5,38 +5,23 @@
     <div ng-if="numberOfStations !== -1">
         <div class="panel-body">
             <div id="manualInputContainer">
-                <form class="form-horizontal" id="wateringTimeForm" style="padding: 10px">
-                        <!-- Stations -->
-                        <div class="form-group row">
-                            <label for="stationsSelectBox">Stations</label>
-                            <select ng-model="stations" class="selectpicker" multiple data-actions-box="true">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                            </select>
-                        </div>
-                        <!-- Duration -->
-                        <div class="form-group row">
-                            <label for="minutesTextbox">Minutes</label>
-                            <input ng-model="duration" id="minutesTextbox" class="form-control" type="number" min="0"
-                                   placeholder="5">
-                        </div>
+                <form class="form-horizontal" id="manualWateringInput" style="padding: 10px">
 
-                        <div class="form-group row">
-                            <div class="btn-toolbar">
-                                <button type="button" id="startManualWaterBtn" class="btn btn-default"
-                                        ng-click="validateManualWatering(stations, duration)">
-                                    Start
-                                </button>
-                            </div>
-                        </div>
+                    <div ng-repeat="station in stations" class="form-group row">
+                        <label>Station {{ station.id }}</label>
+                        <!-- use ng-if on duration. if > 0, display progress bar -->
+                        <input ng-model="station.duration" class="form-control" type="number" min="0" placeholder="0">
+                    </div>
 
-                    </form>
+                    <div class="form-group row">
+                        <div class="btn-toolbar">
+                            <button type="button" id="startManualWaterBtn" class="btn btn-default"
+                                    ng-click="validateManualWatering()">
+                                Start
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
