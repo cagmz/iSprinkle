@@ -83,6 +83,8 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
                 // $log.debug('opt:');
                 // $log.debug(optimized_watering);
 
+                // update size of chart before plotting
+                $scope.options.chart.height = 450;
                 return [{values: fixed_watering, key: 'Fixed', color: '#1b75ba'},
                     {values: optimized_watering, key: 'Optimized', color: '#26a874'}];
             };
@@ -96,7 +98,7 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
         $scope.options = {
             chart: {
                 type: 'lineChart',
-                height: 450,
+                height: 100,
                 margin: {
                     top: 20,
                     right: 75,
@@ -168,6 +170,10 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
 iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$compile', '$route', '$timeout', 'StationFactory',
     function ScheduleController($scope, $http, $log, $compile, $route, $timeout, StationFactory) {
 
+        $scope.$on('$routeChangeStart', function (next, current) {
+            // use this to update active navbar
+        });
+
         // wait until content is loaded before initializing inputs
         $scope.$on('$viewContentLoaded', function () {
             $timeout(function () {
@@ -207,7 +213,7 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
                     // each station may have a set time and duration
                     var stationSchedule = $scope.scheduleData.schedule[station];
                     var stationNumber = parseInt(station.substring(1)) + 1;
-                    rowInject += "<tr><td>Station " + stationNumber + "</td>";
+                    rowInject += "<tr><td>" + stationNumber + "</td>";
 
                     for (var day = 0; day < $scope.weekdays.length; day++) {
                         // dayInfo is an object with start time (string) and duration (int)
@@ -315,6 +321,7 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
             // Convert to an array for easy indexing
             wateringDays = Array.from(wateringDays);
 
+            /*
             $log.debug('wateringDays:');
             $log.debug(wateringDays);
 
@@ -329,11 +336,14 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
 
             $log.debug('startTime:');
             $log.debug(startTime);
+            */
 
             var schedule = $scope.scheduleData.schedule;
 
+            /*
             $log.debug('original schedule');
             $log.debug(schedule);
+            */
 
             for (var i = 0; i < stations.length; i++) {
                 var stationId = 's' + i;
@@ -341,11 +351,11 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
                 $log.debug('\t' + stationId);
                 for (var j = 0; j < wateringDays.length; j++) {
                     var day = wateringDays[j];
-                    $log.debug('Current day');
-                    $log.debug('\t' + day);
+                    // $log.debug('Current day');
+                    // $log.debug('\t' + day);
                     var newStartTime = {"duration": duration, "time": startTime};
-                    $log.debug('Adding startTime');
-                    $log.debug('\t' + startTime);
+                    // $log.debug('Adding startTime');
+                    // $log.debug('\t' + startTime);
                     /*
                      Assume there are no overlaps in station start/end times for POC
                      But a check should be performed here
@@ -361,8 +371,10 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
                 }
             }
 
+            /*
             $log.debug('new Schedule');
             $log.debug($scope.scheduleData.schedule);
+            */
 
             $scope.saveSchedule();
         };
@@ -374,8 +386,7 @@ iSprinkleApp.controller('ManualController', ['$scope', '$http', '$log', '$route'
 
         $scope.$on('$viewContentLoaded', function () {
             $timeout(function () {
-                // check if manual watering is in progress; if so, disable inputs and show progress bar
-
+                // check if manual watering is in progress; if so, show progress bar in place of input
                 $('.manualInputContainer').ready(function () {
                     $(".selectpicker").selectpicker({
                         style: 'btn-default',

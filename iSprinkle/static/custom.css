@@ -28,7 +28,13 @@ body {
 .schedule-cell label {
     margin: 0px;
     font-weight: normal;
-    width: 75px;
+    width: 70px;
+}
+
+.schedule-cell input {
+    border: 1px solid #ccc;
+    color: #555;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
 }
 
 #wateringTimeInputContainer {
