@@ -165,8 +165,26 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
 
     }]);
 
-iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$compile', 'StationFactory',
-    function ScheduleController($scope, $http, $log, $compile, StationFactory) {
+iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$compile', '$route', '$timeout', 'StationFactory',
+    function ScheduleController($scope, $http, $log, $compile, $route, $timeout, StationFactory) {
+
+        // wait until content is loaded before initializing inputs
+        $scope.$on('$viewContentLoaded', function () {
+            $timeout(function () {
+                $('.wateringTimeInputContainer').ready(function () {
+                    $(".selectpicker").selectpicker({
+                        style: 'btn-default',
+                        noneSelectedText: 'None selected'
+                    });
+                    $("#startTimeInput").timepicker({
+                        defaultTime: '12:00 AM',
+                        template: false,
+                        showInputs: false,
+                        minuteStep: 5
+                    });
+                });
+            });
+        });
 
         $scope.weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -248,7 +266,7 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
                 function (response) {
                     if (response.data.reply === 'Schedule saved') {
                         window.alert('Schedule saved');
-                        window.location.reload(true);
+                        $route.reload();
                     } else {
                         errorCallback(response.data.reply);
                     }
@@ -351,10 +369,34 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
 
     }]);
 
-iSprinkleApp.controller('ManualController',
-    function ManualController($scope) {
-        $scope.helloWorld = "ManualController";
-    });
+iSprinkleApp.controller('ManualController', ['$scope', '$http', '$log', '$route', '$timeout', 'StationFactory',
+    function ManualController($scope, $http, $log, $route, $timeout, StationFactory) {
+
+        $scope.$on('$viewContentLoaded', function () {
+            $timeout(function () {
+                // check if manual watering is in progress; if so, disable inputs and show progress bar
+
+                $('.manualInputContainer').ready(function () {
+                    $(".selectpicker").selectpicker({
+                        style: 'btn-default',
+                        noneSelectedText: 'None selected'
+                    });
+                });
+            });
+        });
+
+        $scope.validateManualWatering = function validateManualWatering(stations, duration) {
+
+            $log.debug('stations:');
+            $log.debug(stations);
+            $log.debug('Duration:');
+            $log.debug(duration);
+
+            // use $route to force reload page after validating input and starting manual watering
+
+        };
+
+    }]);
 
 iSprinkleApp.controller('AdminController', ['$scope', '$http', '$log', 'StationFactory',
     function AdminController($scope, $http, $log, StationFactory) {

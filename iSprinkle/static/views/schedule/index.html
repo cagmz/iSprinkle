@@ -1,7 +1,7 @@
 <script>
     /*
      For Debugging: use to access current scope, including variables in controller
-     Use Chorme DevTools to select an element, then call ng().
+     Use Chrome DevTools to select an element, then call ng().
      Alternatively, run this in the console:
      angular.element(document.getElementById("someElementInPage")).scope().someVariable
      */
@@ -35,7 +35,6 @@
                 </table>
             </div>
 
-
             <div class="panel panel-default" id="wateringTimeInputContainer">
                 <div class="panel-heading">
                     <h3 class="panel-title pull-left">
@@ -53,7 +52,7 @@
                         <!-- Stations -->
                         <div class="form-group row">
                             <label for="stationsSelectBox">Stations</label>
-                            <select class="stationsSelectBox" ng-model="stations" multiple="multiple">
+                            <select class="selectpicker" multiple data-actions-box="true" ng-model="stations">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -63,12 +62,6 @@
                                 <option value="7">7</option>
                                 <option value="8">8</option>
                             </select>
-                            <script type="text/javascript">
-                                // can instantiate with available stations using data property
-                                $(document).ready(function () {
-                                    $("#stationsSelectBox").select2();
-                                });
-                            </script>
                         </div>
                         <!-- Duration -->
                         <div class="form-group row">
@@ -79,24 +72,22 @@
                         <!-- Days -->
                         <div class="form-group row">
                             <label for="days-select-box">Days</label>
-                            <select class="daysSelectBox" multiple="multiple" id="days-select-box" ng-model="interval">
-                                <option value="Monday">Monday</option>
-                                <option value="Tuesday">Tuesday</option>
-                                <option value="Wednesday">Wednesday</option>
-                                <option value="Thursday">Thursday</option>
-                                <option value="Friday">Friday</option>
-                                <option value="Saturday">Saturday</option>
-                                <option value="Sunday">Sunday</option>
-                                <option value="odd days">odd days</option>
-                                <option value="even days">even days</option>
-                                <option value="every day">every day</option>
+                            <select class="selectpicker" multiple ng-model="interval">
+                                <optgroup label="Weekdays">
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                    <option value="Sunday">Sunday</option>
+                                </optgroup>
+                                <optgroup label="Multiple">
+                                    <option value="odd days" data-subtext="M, W, F, Sa">odd days</option>
+                                    <option value="even days" data-subtext="T, Th, Sa, Su">even days</option>
+                                    <option value="every day">every day</option>
+                                </optgroup>
                             </select>
-                            <script type="text/javascript">
-                                // can instantiate with available intervals using data property
-                                $(document).ready(function () {
-                                    $("#daysSelectBox").select2();
-                                });
-                            </script>
                         </div>
                         <!-- Start Time -->
                         <div class="form-group row">
@@ -106,16 +97,6 @@
                                        class="form-control">
                                 <i class="icon-time"></i>
                             </div>
-                            <script type="text/javascript">
-                                $(document).ready(function () {
-                                    $("#startTimeInput").timepicker({
-                                        defaultTime: '12:00 AM',
-                                        template: false,
-                                        showInputs: false,
-                                        minuteStep: 5
-                                    });
-                                });
-                            </script>
                         </div>
 
                         <div class="form-group row">
