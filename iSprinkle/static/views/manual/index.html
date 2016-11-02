@@ -1,0 +1,105 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Manual</h3>
+    </div>
+    <div ng-if="numberOfStations === -1" class="panel-body">
+        <div>Error: Unable to contact Web API</div>
+    </div>
+    <div ng-if="numberOfStations !== -1">
+        <div class="panel-body">
+
+            <div id="manualInputContainer">
+                <form class="form-horizontal" id="wateringTimeForm" style="padding: 10px">
+                    <!-- Stations -->
+                    <div class="form-group row">
+                        <label for="stationsSelectBox">Stations</label>
+                        <select class="col-md-8" ng-model="stations" id="stationsSelectBox" multiple>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                        </select>
+                        <script type="text/javascript">
+                            // can instantiate with available stations using data property
+                            $(document).ready(function () {
+                                $("#stationsSelectBox").select2({
+                                    placeholder: "1"
+                                });
+                            });
+                        </script>
+                    </div>
+                    <!-- Duration -->
+                    <div class="form-group row">
+                        <label for="minutesTextbox">Minutes</label>
+                        <input ng-model="duration" id="minutesTextbox" class="form-control" type="number" min="0"
+                               placeholder="5">
+                    </div>
+                    <!-- Days -->
+                    <div class="form-group row">
+                        <label for="daysSelectBox">Days</label>
+                        <select ng-model="interval" id="daysSelectBox" multiple="multiple">
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                            <option value="odd days">odd days</option>
+                            <option value="even days">even days</option>
+                            <option value="every day">every day</option>
+                        </select>
+                        <script type="text/javascript">
+                            // can instantiate with available intervals using data property
+                            $(document).ready(function () {
+                                $("#daysSelectBox").select2({
+                                    placeholder: "Monday"
+                                });
+                            });
+                        </script>
+                    </div>
+                    <!-- Start Time -->
+                    <div class="form-group row">
+                        <label for="startTimeInput">Start time:</label>
+                        <div class="bootstrap-timepicker">
+                            <input ng-model="startTime" id="startTimeInput" value="12:00 AM" type="text"
+                                   class="form-control">
+                            <i class="icon-time"></i>
+                        </div>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                $('#startTimeInput').timepicker({
+                                    defaultTime: '12:00 AM',
+                                    template: false,
+                                    showInputs: false,
+                                    minuteStep: 5
+                                });
+                            });
+                        </script>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="btn-toolbar">
+                            <button type="button" id="hideWateringTimeFormBtn"
+                                    class="btn btn-default"
+                                    onclick="toggleWateringTimeForm()">
+                                Cancel
+                            </button>
+                            <button type="button" id="submitWateringTimeBtn" class="btn btn-default"
+                                    ng-click="validateWateringTime(stations, duration, interval, startTime)">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div> <!-- /ManualController div -->
+

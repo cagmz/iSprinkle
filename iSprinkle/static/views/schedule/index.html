@@ -49,11 +49,11 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal" id="wateringTimeForm" style="padding: 10px; display: none;">
+                    <form class="form-horizontal" id="wateringTimeForm" style="padding: 10px">
                         <!-- Stations -->
                         <div class="form-group row">
                             <label for="stationsSelectBox">Stations</label>
-                            <select class="col-md-8" ng-model="stations" id="stationsSelectBox" multiple>
+                            <select class="stationsSelectBox" ng-model="stations" multiple="multiple">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -66,9 +66,7 @@
                             <script type="text/javascript">
                                 // can instantiate with available stations using data property
                                 $(document).ready(function () {
-                                    $("#stationsSelectBox").select2({
-                                        placeholder: "1"
-                                    });
+                                    $("#stationsSelectBox").select2();
                                 });
                             </script>
                         </div>
@@ -80,8 +78,8 @@
                         </div>
                         <!-- Days -->
                         <div class="form-group row">
-                            <label for="daysSelectBox">Days</label>
-                            <select ng-model="interval" id="daysSelectBox" multiple="multiple">
+                            <label for="days-select-box">Days</label>
+                            <select class="daysSelectBox" multiple="multiple" id="days-select-box" ng-model="interval">
                                 <option value="Monday">Monday</option>
                                 <option value="Tuesday">Tuesday</option>
                                 <option value="Wednesday">Wednesday</option>
@@ -96,15 +94,13 @@
                             <script type="text/javascript">
                                 // can instantiate with available intervals using data property
                                 $(document).ready(function () {
-                                    $("#daysSelectBox").select2({
-                                        placeholder: "Monday"
-                                    });
+                                    $("#daysSelectBox").select2();
                                 });
                             </script>
                         </div>
                         <!-- Start Time -->
                         <div class="form-group row">
-                            <label for="startTimeInput">Start time:</label>
+                            <label for="startTimeInput">Start time</label>
                             <div class="bootstrap-timepicker">
                                 <input ng-model="startTime" id="startTimeInput" value="12:00 AM" type="text"
                                        class="form-control">
@@ -112,7 +108,7 @@
                             </div>
                             <script type="text/javascript">
                                 $(document).ready(function () {
-                                    $('#startTimeInput').timepicker({
+                                    $("#startTimeInput").timepicker({
                                         defaultTime: '12:00 AM',
                                         template: false,
                                         showInputs: false,
