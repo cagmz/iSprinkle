@@ -174,24 +174,6 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
             // use this to update active navbar
         });
 
-        // wait until content is loaded before initializing inputs
-        $scope.$on('$viewContentLoaded', function () {
-            $timeout(function () {
-                $('.scheduleContainer').ready(function () {
-                    $('.selectpicker').selectpicker({
-                        style: 'btn-default',
-                        noneSelectedText: 'None selected'
-                    });
-                    $('#startTimeInput').timepicker({
-                        defaultTime: '12:00 AM',
-                        template: false,
-                        showInputs: false,
-                        minuteStep: 5
-                    });
-                });
-            });
-        });
-
         $scope.weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
         $scope.numberOfStations = -1;

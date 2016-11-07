@@ -3,13 +3,12 @@
         <h3 class="panel-title">Manual</h3>
     </div>
     <div ng-if="numberOfStations !== -1">
+        <!-- TODO: Test to see if selectpicker works correctly on cloud9 -->
         <div class="panel-body">
             <div id="manualInputContainer">
                 <form class="form-horizontal" id="manualWateringInput" style="padding: 10px">
-
                     <div ng-repeat="station in stations" class="form-group row">
                         <label class="form-control-static col-xs-2">Station {{ station.id }}</label>
-
                         <!-- use ng-if on duration. if > 0, display progress bar -->
                         <div class="col-xs-8 input-group">
                             <input ng-model="station.duration" class="form-control col-xs-8" type="number" min="0"

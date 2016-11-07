@@ -12,6 +12,16 @@
         if (!$('#wateringTimeInputContainer').is(':visible')) {
             $('#addWateringTimeBtn').hide();
             $('#wateringTimeInputContainer').show();
+            $('.selectpicker').selectpicker({
+                style: 'btn-default',
+                noneSelectedText: 'None selected'
+            });
+            $('#startTimeInput').timepicker({
+                defaultTime: '12:00 AM',
+                template: false,
+                showInputs: false,
+                minuteStep: 5
+            });
         } else {
             $('#addWateringTimeBtn').show();
             $('#wateringTimeInputContainer').hide();
@@ -29,7 +39,7 @@
     <div ng-if="numberOfStations !== -1">
         <div class="panel-body">
 
-            <div id="scheduleContainer table-responsive">
+            <div id="scheduleContainer" class="table-responsive">
                 <table id="scheduleTable" class="table table-bordered table-condensed">
                     <!-- Rows are dynamically generated in the controller and compiled by Angular -->
                 </table>
@@ -52,17 +62,17 @@
                         <div class="form-group row">
                             <label class="form-control-static col-xs-2" for="stationsSelectBox">Stations</label>
                             <div class="col-xs-10">
-                            <select class="selectpicker" multiple data-actions-box="true" ng-model="stations">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                            </select>
-                                </div>
+                                <select class="selectpicker" multiple data-actions-box="true" ng-model="stations">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
+                            </div>
                         </div>
                         <!-- Duration -->
                         <div class="form-group row">
