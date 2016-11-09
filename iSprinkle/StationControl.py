@@ -2,32 +2,37 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.parser import parse
 from dateutil.tz import tz
 import datetime
+import atexit
+
+GPIO = None
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    print('Error: Unable to import RPi.GPIO module (watering function disabled).')
 
 
 class StationControl(object):
+
+    # GPIO Pins (BCM numbering). OSPI uses 4 pins for shift register.
+    clock_pin = 4
+    out_pin = 17
+    data_pin = 27
+    latch_pin = 22
+
     def __init__(self, stations, settings_handler):
         self.num_stations = stations
-        self.user = settings_handler.get_settings_key('user')
+        self.station_status = [False] * self.num_stations
 
-        # instead of separate station id and status, use a dictionary
-        # use dictionary.length instead of num_stations
-        # self.station_status = {stationId: ON|OFF}
-        self.station_status = {}
-        self.reset_stations()
+        if GPIO:
+            atexit.register(self.cleanup)
+            # GPIO.setwarnings(False)
+            self.setup_gpio()
 
         # schedule dict is a parsed version of the watering schedule in settings.json
         # unparsed schedule is in SettingsHandler object
         self.schedule = {}
-
         self.watering_scheduler = BackgroundScheduler()
         self.set_schedule(settings_handler.get_schedule())
-
-    def set_station(self, station, signal):
-        self.station_status[station] = signal
-
-    def reset_stations(self):
-        for i in range(0, self.num_stations):
-            self.set_station(i, False)
 
     def set_schedule(self, settings_json):
         # schedule dictionary:
@@ -56,6 +61,51 @@ class StationControl(object):
         if not self.watering_scheduler.state:
             self.watering_scheduler.start()
 
+    def set_station(self, station, signal):
+        self.station_status[station] = signal
+
+    def reset_stations(self):
+        self.station_status = [False] * self.num_stations
+
+    def set_shift_register_values(self):
+        if not GPIO:
+            print('Error: set_shift_register_values() doesn\'t have GPIO module')
+            return
+        GPIO.output(StationControl.clock_pin, False)
+        GPIO.output(StationControl.latch_pin, False)
+        for station in range(0, self.num_stations):
+            GPIO.output(StationControl.clock_pin, False)
+            GPIO.output(StationControl.data_pin, self.station_status[self.num_stations - 1 - station])
+            GPIO.output(StationControl.clock_pin, True)
+        GPIO.output(StationControl.latch_pin, True)
+
+    def toggle_shift_register_output(self, value):
+        if value:
+            GPIO.output(StationControl.out_pin, False)
+        else:
+            GPIO.output(StationControl.out_pin, True)
+
+    def setup_gpio(self):
+        if not GPIO:
+            print('Error: setup_gpio() doesn\'t have GPIO module')
+            return
+
+        print('Setting up GPIO')
+        # clean up after any previous applications
+        GPIO.cleanup()
+        # setup GPIO pins to interface with shift register
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(StationControl.clock_pin, GPIO.OUT)
+        GPIO.setup(StationControl.out_pin, GPIO.OUT)
+        self.toggleShiftRegisterOutput(False)
+        GPIO.setup(StationControl.data_pin, GPIO.OUT)
+        GPIO.setup(StationControl.latch_pin, GPIO.OUT)
+        self.setShiftRegisterValues()
+        self.toggleShiftRegisterOutput(True)
+
+    def cleanup(self):
+        self.reset_stations()
+        GPIO.cleanup()
 
 def water(station='-1', scheduled_time='23:59', duration='-1'):
     import time

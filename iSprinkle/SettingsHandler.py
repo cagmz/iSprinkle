@@ -147,7 +147,7 @@ class SettingsHandler(object):
             conn.close()
 
     def usage(self, start_date, end_date, stations):
-        # TODO: build compound WHERE clause to include stations
+        # TODO: build compound WHERE clause to include selected stations
         conn = sqlite3.connect(self.database_path)
         curr = conn.cursor()
         curr.execute('SELECT * FROM historical WHERE (datetime BETWEEN ? AND ?)', (start_date, end_date))
