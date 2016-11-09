@@ -1,6 +1,5 @@
 import os
 from subprocess import check_output
-from datetime import timedelta
 
 
 def get_lan_ip():

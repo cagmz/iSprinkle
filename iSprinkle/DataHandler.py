@@ -1,9 +1,9 @@
 import os
 import json
 import sqlite3
-from dateutil import rrule, parser
 
-class SettingsHandler(object):
+
+class DataHandler(object):
     def __init__(self, root_path):
         settings_file = '../data/settings.json'
         self.settings_path = os.path.join(root_path, settings_file)
@@ -125,7 +125,7 @@ class SettingsHandler(object):
         try:
             return self.settings[key]
         except KeyError:
-            return "Error: key {} doesn't exist in the SettingsHandler settings".format(key)
+            return "Error: key {} doesn't exist in the DataHandler settings".format(key)
 
     def init_database(self):
         if not os.path.isfile(self.database_path):

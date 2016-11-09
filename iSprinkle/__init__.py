@@ -1,35 +1,25 @@
-import os
-
 from flask import Flask, g
 
 app = Flask(__name__)
+
 from iSprinkle.StationControl import StationControl
-from iSprinkle.SettingsHandler import SettingsHandler
+from iSprinkle.DataHandler import DataHandler
 
 import iSprinkle.views
 import iSprinkle.utils
 
 station_control = None
-settings_handler = None
+data_handler = None
 
 MAX_STATIONS = 8
-
-
-def create_settings_handler():
-    global settings_handler
-    settings_handler = SettingsHandler(app.root_path)
-
-
-def create_station_control():
-    global station_control
-    station_control = StationControl(MAX_STATIONS, settings_handler)
 
 
 # Always run these
 def setup():
     try:
-        create_settings_handler()
-        create_station_control()
+        global data_handler, station_control
+        data_handler = DataHandler(app.root_path)
+        station_control = StationControl(MAX_STATIONS, data_handler)
     except (RuntimeError, OSError) as e:
         print(e)
         # cleanup

@@ -19,7 +19,7 @@ class StationControl(object):
     data_pin = 27
     latch_pin = 22
 
-    def __init__(self, stations, settings_handler):
+    def __init__(self, stations, data_handler):
         self.num_stations = stations
         self.station_status = [False] * self.num_stations
 
@@ -32,7 +32,7 @@ class StationControl(object):
         # unparsed schedule is in SettingsHandler object
         self.schedule = {}
         self.watering_scheduler = BackgroundScheduler()
-        self.set_schedule(settings_handler.get_schedule())
+        self.set_schedule(data_handler.get_schedule())
 
     def set_schedule(self, settings_json):
         # schedule dictionary:

@@ -1,4 +1,3 @@
-#!/usr/bin/python
 from iSprinkle import app
 from flask import make_response
 
