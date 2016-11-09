@@ -3,15 +3,14 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
         // Call web api to retrieve and display historical data
 
         $scope.getUsageData = function (startDate, endDate, stations) {
-            // todo: change to ISO 8601... http://momentjs.com/docs/#/parsing/special-formats/
-            var internalDateFormat = "YYYY-MM-DD HH:mm:ssZ";
+            var internalDateFormat = "YYYY-MM-DDTHH:mm:ssZ";
 
             if (startDate && endDate) {
                 startDate = moment(startDate).utc().format(internalDateFormat);
                 endDate = moment(endDate).utc().format(internalDateFormat);
             } else {
                 if (!startDate) {
-                    startDate = '1969-07-20 20:18:00+00:00';
+                    startDate = '1969-07-20T20:18:00+00:00';
                 }
                 if (!endDate) {
                     // set end date to today
@@ -110,7 +109,7 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
                     /*
                      x axis values (dates) must be converted to UTC milliseconds
                      so d3 can use them
-                     "2016-04-04 07:00:00+00:00" -> 1459753200000
+                     "2016-04-04T07:00:00+00:00" -> 1459753200000
                      */
                     return moment.utc(d.x).valueOf();
                 },

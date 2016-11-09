@@ -32,8 +32,8 @@ def schedule():
 
 @app.route('/api/usage', methods=['GET'])
 def usage():
-    start_date = request.args.get('startDate')
-    end_date = request.args.get('endDate')
+    start_date = request.args.get('startDate').replace(' ', '+')
+    end_date = request.args.get('endDate').replace(' ', '+')
     requested_stations = request.args.get('stations').split(',')
     records = iSprinkle.settings_handler.usage(start_date, end_date, requested_stations)
     # todo: Preprocess records so that return is:
