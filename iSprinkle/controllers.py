@@ -7,6 +7,23 @@ def stations():
     return jsonify(stations=iSprinkle.station_control.num_stations)
 
 
+@app.route('/api/manual', methods=['GET', 'POST'])
+def manual():
+    if request.method == 'POST':
+        manualWaterRequest = request.get_json()
+        result = iSprinkle.station_control.manual_watering(manualWaterRequest)
+        post_reply = {}
+        if result:
+            post_reply['reply'] = 'Success'
+        else:
+            post_reply['reply'] = 'Error manually watering'
+        return jsonify(post_reply)
+    elif request.method == 'GET':
+        # check if manual watering is in progress
+        # this is where a check for bgscheduler.pause() would be made
+        return jsonify('To be implemented')
+
+
 @app.route('/api/schedule', methods=['GET', 'POST'])
 def schedule():
     if request.method == 'POST':

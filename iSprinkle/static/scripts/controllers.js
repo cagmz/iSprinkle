@@ -384,15 +384,41 @@ iSprinkleApp.controller('ManualController', ['$scope', '$http', '$log', '$route'
         StationFactory.getNumberOfStations().then(function (response) {
             $scope.numberOfStations = response.data.stations;
             for (var i = 0; i < $scope.numberOfStations; i++) {
-                var stationObject = {'id': (i + 1), 'duration': 0};
+                var stationObject = {'id': i, 'duration': 0};
                 $scope.stations.push(stationObject);
             }
         });
 
         $scope.validateManualWatering = function validateManualWatering() {
+            var manualWaterRequest = {};
+            for (var idx in $scope.stations) {
+                var stationObj = $scope.stations[idx];
+                if (stationObj.duration > 0) {
+                    manualWaterRequest[stationObj.id] = stationObj.duration;
+                }
+            }
 
-            $log.debug('Manual input object');
-            $log.debug($scope.stations);
+            if (Object.keys(manualWaterRequest).length === 0 && manualWaterRequest.constructor === Object) {
+                window.alert('At least one station duration must be greater than 0.');
+                return;
+            }
+
+            $log.debug(manualWaterRequest);
+
+            $http.post('api/manual', manualWaterRequest).then(
+                function (response) {
+                    if (response.data.reply === 'Success') {
+                        window.alert('Manual watering in progress... ');
+                        // $route.reload();
+                    } else {
+                        errorCallback(response.data.reply);
+                    }
+                },
+                errorCallback);
+
+            function errorCallback(err) {
+                err === undefined ? window.alert(err) : window.alert(err);
+            }
 
             // use $route to force reload page after validating input and starting manual watering
 

@@ -1,6 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.parser import parse
 from dateutil.tz import tz
+from arrow import Arrow
 import datetime
 import atexit
 
@@ -12,7 +13,6 @@ except ImportError:
 
 
 class StationControl(object):
-
     # GPIO Pins (BCM numbering). OSPI uses 4 pins for shift register.
     clock_pin = 4
     out_pin = 17
@@ -22,23 +22,26 @@ class StationControl(object):
     def __init__(self, stations, data_handler):
         self.num_stations = stations
         self.station_status = [False] * self.num_stations
+        self.data_handler = data_handler
+        self.watering = False
+
+        # schedule dict is a parsed version of the watering schedule in settings.json
+        # unparsed schedule is in SettingsHandler object
+        self.bg_scheduler = BackgroundScheduler()
+        self.schedule = {}
+        self.set_schedule(self.data_handler.get_schedule())
 
         if GPIO:
             atexit.register(self.cleanup)
             # GPIO.setwarnings(False)
             self.setup_gpio()
 
-        # schedule dict is a parsed version of the watering schedule in settings.json
-        # unparsed schedule is in SettingsHandler object
-        self.schedule = {}
-        self.watering_scheduler = BackgroundScheduler()
-        self.set_schedule(data_handler.get_schedule())
-
     def set_schedule(self, settings_json):
+        print('Setting schedule at {}'.format(Arrow.now().time().isoformat()))
         # schedule dictionary:
         # (key) = (value) => (station, day) = (datetime in utc, watering duration)
 
-        self.watering_scheduler.remove_all_jobs()
+        self.bg_scheduler.remove_all_jobs()
 
         stations = settings_json['schedule']
         timezone_offset = settings_json['timezone_offset']
@@ -55,11 +58,58 @@ class StationControl(object):
                     # if actually watering (duration > 0)
                     self.schedule.setdefault((station, day), []).append((utc_time, duration))
                     if duration > 0:
-                        self.watering_scheduler.add_job(water, 'date', run_date=utc_time, args=[station, time_str, duration])
+                        # todo: set 'interval' trigger instead of 'date'.
+                        # this way, manual_watering() doesn't need to remove/replace all jobs
+                        self.bg_scheduler.add_job(self.water, 'date', run_date=utc_time,
+                                                  args=[station, time_str, duration])
             print('Added water_schedule jobs for {}'.format(station))
         # start the scheduler if it's not already running
-        if not self.watering_scheduler.state:
-            self.watering_scheduler.start()
+        if not self.bg_scheduler.state:
+            self.bg_scheduler.start()
+
+    def manual_watering(self, watering_request):
+        # override the current schedule and clear jobs
+        self.bg_scheduler.remove_all_jobs()
+        start, last_duration_seconds = Arrow.utcnow(), 15
+
+        print('Original start: {}'.format(start))
+        # for every station, set a scheduling for the duration specified
+        # stations are ran serially
+        for station, duration in watering_request.items():
+            job_start = start.replace(seconds=last_duration_seconds)
+            print('Station {} will start at {} for {} minutes'.format(station, job_start, duration))
+            self.bg_scheduler.add_job(self.water, 'date', run_date=job_start.isoformat(' '),
+                                      args=[station, job_start.isoformat(' '), duration])
+            last_duration_seconds = duration * 60
+
+        # reschedule the original schedule after all stations have watered
+        job_start = start.replace(minutes=last_duration_seconds)
+        self.bg_scheduler.add_job(self.set_schedule, 'date', run_date=job_start.isoformat(' '),
+                                  args=[self.data_handler.get_schedule()])
+
+
+        # scheduled all requested stations, + 1 for the original schedule
+        if len(self.bg_scheduler.get_jobs()) == (len(watering_request) + 1):
+            return True
+
+        return False
+
+    def water(self, station='-1', scheduled_time='23:59', duration='-1'):
+        self.watering = True
+        import time
+        print(
+            'water(station={}, scheduled_time={}, duration={}), time_now = {}'.format(station, scheduled_time, duration,
+                                                                                      str(datetime.datetime.now())))
+
+        # activate solenoid
+        # TODO: watering must be done serially. Enforce this constraint client-side
+        seconds = int(duration) * 60
+        while seconds > 0:
+            print('drip.... second {}'.format(seconds))
+            time.sleep(1)
+            seconds -= 1
+        print('Station {} finished watering'.format(station))
+        self.watering = False
 
     def set_station(self, station, signal):
         self.station_status[station] = signal
@@ -106,19 +156,6 @@ class StationControl(object):
     def cleanup(self):
         self.reset_stations()
         GPIO.cleanup()
-
-def water(station='-1', scheduled_time='23:59', duration='-1'):
-    import time
-    print('water(station={}, scheduled_time={}, duration={}), time_now = {}'.format(station, scheduled_time, duration, str(datetime.datetime.now())))
-
-    # activate solenoid
-    # TODO: watering must be done serially. Enforce this constraint client-side
-    seconds = int(duration) * 60
-    while seconds > 0:
-        print('drip.... second {}'.format(seconds))
-        time.sleep(1)
-        seconds -= 1
-    print('Station {} finished watering'.format(station))
 
 
 def timestr_to_utc(time_str, local=True):

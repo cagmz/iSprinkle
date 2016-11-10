@@ -10,8 +10,8 @@
                     <div ng-repeat="station in stations" class="form-group row">
                         <label class="form-control-static col-xs-2">Station {{ station.id }}</label>
                         <!-- use ng-if on duration. if > 0, display progress bar -->
-                        <div class="col-xs-8 input-group">
-                            <input ng-model="station.duration" class="form-control col-xs-8" type="number" min="0"
+                        <div class="col-xs-10 input-group">
+                            <input ng-model="station.duration" class="form-control" type="number" min="0"
                                    placeholder="0">
                             <div class="input-group-addon">minutes</div>
                         </div>
