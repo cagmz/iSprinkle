@@ -26,10 +26,9 @@ class DataHandler(object):
         else:
             # create default settings file if one didn't exist
             print("Creating default settings file")
-            # default timezone is -07:00
             default_settings = {
                 "user": "New user",
-                "timezone_offset": "-07:00",
+                "timezone_offset": "-08:00",
                 "schedule": {
                     "s0": {
                         "Monday": {"start_times": []},

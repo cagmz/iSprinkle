@@ -28,13 +28,17 @@ class StationControl(object):
         # schedule dict is a parsed version of the watering schedule in settings.json
         # unparsed schedule is in SettingsHandler object
         self.bg_scheduler = BackgroundScheduler()
-        self.schedule = {}
+        self.manual_scheduler = None
         self.set_schedule(self.data_handler.get_schedule())
+        self.utc_timezone_offset = self.data_handler.get_schedule()['timezone_offset']
+        print(self.utc_timezone_offset)
 
         if GPIO:
             atexit.register(self.cleanup)
             # GPIO.setwarnings(False)
             self.setup_gpio()
+
+
 
     def set_schedule(self, settings_json):
         print('Setting schedule at {}'.format(Arrow.now().time().isoformat()))
@@ -48,28 +52,36 @@ class StationControl(object):
         for station in stations:
             for day in stations[station]:
                 for start_time in stations[station][day]['start_times']:
-                    time_str = start_time['time'] + " " + timezone_offset
+                    time_str = day + " " + start_time['time'] + " " + timezone_offset
                     # get 12 hour time and convert to time-zone aware datetime object (24 hour UTC time) for use internally
                     utc_time = timestr_to_utc(time_str)
-
                     duration = int(start_time['duration'])
+                    # todo: set 'interval' trigger instead of 'date'.
+                    # this way, manual_watering() doesn't need to remove/replace all jobs
+                    self.bg_scheduler.add_job(self.water, 'date', run_date=utc_time, args=[station, time_str, duration])
 
-                    # add all stations to the static schedule, but only add a watering job to the watering schedule
-                    # if actually watering (duration > 0)
-                    self.schedule.setdefault((station, day), []).append((utc_time, duration))
-                    if duration > 0:
-                        # todo: set 'interval' trigger instead of 'date'.
-                        # this way, manual_watering() doesn't need to remove/replace all jobs
-                        self.bg_scheduler.add_job(self.water, 'date', run_date=utc_time,
-                                                  args=[station, time_str, duration])
             print('Added water_schedule jobs for {}'.format(station))
         # start the scheduler if it's not already running
         if not self.bg_scheduler.state:
             self.bg_scheduler.start()
 
+    def pause_schedule(self):
+        print('Pausing schedule')
+        for job in self.bg_scheduler.get_jobs():
+            job.pause()
+
+    def resume_schedule(self):
+        print('Resuming schedule')
+        for job in self.bg_scheduler.get_jobs():
+            job.resume()
+
     def manual_watering(self, watering_request):
-        # override the current schedule and clear jobs
-        self.bg_scheduler.remove_all_jobs()
+        # pause normal schedule
+        self.pause_schedule()
+
+        if not self.manual_scheduler:
+            self.manual_scheduler = BackgroundScheduler()
+
         start, last_duration_seconds = Arrow.utcnow(), 15
 
         print('Original start: {}'.format(start))
@@ -77,39 +89,25 @@ class StationControl(object):
         # stations are ran serially
         for station, duration in watering_request.items():
             job_start = start.replace(seconds=last_duration_seconds)
-            print('Station {} will start at {} for {} minutes'.format(station, job_start, duration))
-            self.bg_scheduler.add_job(self.water, 'date', run_date=job_start.isoformat(' '),
-                                      args=[station, job_start.isoformat(' '), duration])
+            print('Station {} will start at {} for {} minutes'.format(
+                station, job_start.format('YYYY-MM-DD HH:mm:ssZZ'), duration))
+            self.manual_scheduler.add_job(self.water, 'date', run_date=job_start.datetime,
+                                      args=[station, job_start.format('YYYY-MM-DD HH:mm:ss ZZ'), duration])
             last_duration_seconds = duration * 60
 
         # reschedule the original schedule after all stations have watered
         job_start = start.replace(minutes=last_duration_seconds)
-        self.bg_scheduler.add_job(self.set_schedule, 'date', run_date=job_start.isoformat(' '),
-                                  args=[self.data_handler.get_schedule()])
+        self.manual_scheduler.add_job(self.resume_schedule, 'date', run_date=job_start.datetime,
+                                  args=[])
 
+        if not self.manual_scheduler.state:
+            self.manual_scheduler.start()
 
-        # scheduled all requested stations, + 1 for the original schedule
-        if len(self.bg_scheduler.get_jobs()) == (len(watering_request) + 1):
+        # was able to schedule all requested stations, + 1 for resuming the original schedule
+        if len(self.manual_scheduler.get_jobs()) == (len(watering_request) + 1):
             return True
 
         return False
-
-    def water(self, station='-1', scheduled_time='23:59', duration='-1'):
-        self.watering = True
-        import time
-        print(
-            'water(station={}, scheduled_time={}, duration={}), time_now = {}'.format(station, scheduled_time, duration,
-                                                                                      str(datetime.datetime.now())))
-
-        # activate solenoid
-        # TODO: watering must be done serially. Enforce this constraint client-side
-        seconds = int(duration) * 60
-        while seconds > 0:
-            print('drip.... second {}'.format(seconds))
-            time.sleep(1)
-            seconds -= 1
-        print('Station {} finished watering'.format(station))
-        self.watering = False
 
     def set_station(self, station, signal):
         self.station_status[station] = signal
@@ -156,6 +154,22 @@ class StationControl(object):
     def cleanup(self):
         self.reset_stations()
         GPIO.cleanup()
+
+    def water(self, station='-1', scheduled_time='23:59', duration='-1'):
+        self.watering = True
+        import time
+        print(
+            'water(station={}, scheduled_time={}, duration={}), time_now = {}'.format(station, scheduled_time, duration,
+                                                                                      str(datetime.datetime.now())))
+
+        # activate solenoid
+        seconds = int(duration) * 60
+        while seconds > 0:
+            print('drip.... second {}'.format(seconds))
+            time.sleep(1)
+            seconds -= 1
+        print('Station {} finished watering'.format(station))
+        self.watering = False
 
 
 def timestr_to_utc(time_str, local=True):

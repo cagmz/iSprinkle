@@ -327,7 +327,7 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
             */
 
             for (var i = 0; i < stations.length; i++) {
-                var stationId = 's' + i;
+                var stationId = 's' + stations[i];
                 $log.debug('Current station');
                 $log.debug('\t' + stationId);
                 for (var j = 0; j < wateringDays.length; j++) {
