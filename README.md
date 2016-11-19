@@ -66,4 +66,4 @@ PRs accepted.
 
 ## License
 
-MIT © Richard McRichface
+MIT © Carlos Adrian Gomez
