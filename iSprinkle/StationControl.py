@@ -38,8 +38,6 @@ class StationControl(object):
             # GPIO.setwarnings(False)
             self.setup_gpio()
 
-
-
     def set_schedule(self, settings_json):
         print('Setting schedule at {}'.format(Arrow.now().time().isoformat()))
         # schedule dictionary:
@@ -67,22 +65,26 @@ class StationControl(object):
 
     def pause_schedule(self):
         print('Pausing schedule')
+        jobs_paused = 0
         for job in self.bg_scheduler.get_jobs():
             job.pause()
+            print('Paused job {}'.format(job))
+            jobs_paused += 1
+        return jobs_paused
 
     def resume_schedule(self):
         print('Resuming schedule')
         for job in self.bg_scheduler.get_jobs():
             job.resume()
+            print('Resumed job {}'.format(job))
+        print('Resumed schedule')
 
     def manual_watering(self, watering_request):
         # pause normal schedule
-        self.pause_schedule()
+        jobs_paused = self.pause_schedule()
 
-        if not self.manual_scheduler:
-            self.manual_scheduler = BackgroundScheduler()
-
-        start, last_duration_seconds = Arrow.utcnow(), 15
+        start, last_duration_seconds = Arrow.utcnow(), 0
+        start_buffer_seconds = 1
 
         print('Original start: {}'.format(start))
         # for every station, set a scheduling for the duration specified
@@ -90,21 +92,20 @@ class StationControl(object):
         for station, duration in watering_request.items():
             job_start = start.replace(seconds=last_duration_seconds)
             print('Station {} will start at {} for {} minutes'.format(
-                station, job_start.format('YYYY-MM-DD HH:mm:ssZZ'), duration))
-            self.manual_scheduler.add_job(self.water, 'date', run_date=job_start.datetime,
+                station, job_start.format('HH:mm:ssZZ'), duration))
+            self.bg_scheduler.add_job(self.water, 'date', run_date=job_start.datetime,
                                       args=[station, job_start.format('YYYY-MM-DD HH:mm:ss ZZ'), duration])
             last_duration_seconds = duration * 60
 
         # reschedule the original schedule after all stations have watered
-        job_start = start.replace(minutes=last_duration_seconds)
-        self.manual_scheduler.add_job(self.resume_schedule, 'date', run_date=job_start.datetime,
-                                  args=[])
+        print('start buffer in seconds is {}'.format(start_buffer_seconds))
+        job_start = start.replace(seconds=last_duration_seconds + start_buffer_seconds)
+        print('job start for resuming schedule is {}'.format(job_start.format('HH:mm:ssZZ')))
 
-        if not self.manual_scheduler.state:
-            self.manual_scheduler.start()
+        self.bg_scheduler.add_job(self.resume_schedule, 'date', run_date=job_start.datetime, args=[])
 
-        # was able to schedule all requested stations, + 1 for resuming the original schedule
-        if len(self.manual_scheduler.get_jobs()) == (len(watering_request) + 1):
+        # check if schedule contains: paused jobs, manual watering jobs, and extra job to resume paused jobs
+        if len(self.bg_scheduler.get_jobs()) == (jobs_paused + len(watering_request) + 1):
             return True
 
         return False
