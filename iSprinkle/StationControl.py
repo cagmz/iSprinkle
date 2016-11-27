@@ -87,11 +87,12 @@ class StationControl(object):
         # for every station, set a scheduling for the duration specified
         # stations are ran serially
         for station, duration in watering_request.items():
+            station_id = int(station)
             job_start = start.replace(seconds=last_duration_seconds)
             print('Station {} will start at {} for {} minutes'.format(
                 station, job_start.format('HH:mm:ssZZ'), duration))
             self.bg_scheduler.add_job(self.water, 'date', run_date=job_start.datetime,
-                                      args=[station, duration])
+                                      args=[station_id, duration])
             last_duration_seconds = duration * 60
 
         # reschedule the original schedule after all stations have watered
@@ -99,7 +100,7 @@ class StationControl(object):
         job_start = start.replace(seconds=last_duration_seconds + start_buffer_seconds)
         print('job start for resuming schedule is {}'.format(job_start.format('HH:mm:ssZZ')))
 
-        self.bg_scheduler.add_job(self.resume_schedule, 'date', run_date=job_start.datetime, args=[])
+        self.bg_scheduler.add_job(self.resume_schedule, 'date', run_date=job_start.datetime)
 
         # check if schedule contains: paused jobs, manual watering jobs, and extra job to resume paused jobs
         if len(self.bg_scheduler.get_jobs()) == (jobs_paused + len(watering_request) + 1):
@@ -158,9 +159,7 @@ class StationControl(object):
     def cleanup(self):
         self.reset_stations()
         GPIO.cleanup()
-    
-    #def water(self, station='-1', scheduled_time='23:59', duration='-1'):
-    
+        
     def water(self, station, duration):
         self.watering = True
         print('Station {} watering for {} min at {}'.format(station, duration, datetime.now().strftime('%c')))
