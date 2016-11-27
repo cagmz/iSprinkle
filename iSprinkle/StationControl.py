@@ -1,4 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
+from time import sleep
 from datetime import datetime, timezone
 from dateutil.parser import parse
 from dateutil.tz import tz
@@ -39,14 +40,12 @@ class StationControl(object):
 
     def set_schedule(self, settings_json):
         self.bg_scheduler.remove_all_jobs()
-
         stations = settings_json['schedule']
-        timezone_offset = self.utc_timezone_offset #settings_json['timezone_offset']
         for station in stations:
             for day in stations[station]:
                 for start_time in stations[station][day]['start_times']:
                     station_id = int(station[-1])
-                    time_str = day + " " + start_time['time'] + " " + timezone_offset
+                    time_str = day + " " + start_time['time'] + " " + self.utc_timezone_offset
                     # get 12 hour time and convert to time-zone aware datetime object (24 hour UTC time) for use internally
                     utc_time = timestr_to_utc(time_str)
                     duration = int(start_time['duration'])
@@ -54,9 +53,9 @@ class StationControl(object):
                     print('Station {} will start at {} for {} minutes'.format(station_id, utc_time, duration))
                     # TODO: set 'interval' trigger instead of 'date'.
                     # Jobs may exit scheduler after running once if the 'date' trigger is used
-                    self.bg_scheduler.add_job(self.water, 'date', run_date=utc_time, args=[station_id, time_str, duration])
-
+                    self.bg_scheduler.add_job(self.water, 'date', run_date=utc_time, args=[station_id, duration])
             print('Added start times for station {}'.format(station))
+        
         # start the scheduler if it's not already running
         if not self.bg_scheduler.state:
             self.bg_scheduler.start()
@@ -92,7 +91,7 @@ class StationControl(object):
             print('Station {} will start at {} for {} minutes'.format(
                 station, job_start.format('HH:mm:ssZZ'), duration))
             self.bg_scheduler.add_job(self.water, 'date', run_date=job_start.datetime,
-                                      args=[station, job_start.format('YYYY-MM-DD HH:mm:ss ZZ'), duration])
+                                      args=[station, duration])
             last_duration_seconds = duration * 60
 
         # reschedule the original schedule after all stations have watered
@@ -109,12 +108,16 @@ class StationControl(object):
         return False
 
     def set_station(self, station, signal):
+        """
+        Sets station [0,..., 7] to True or False (On | Off) in memory.
+        Use set_shift_register_values() to activate GPIO
+        """
         self.station_status[station] = signal
 
-    def reset_stations(self):
-        self.station_status = [False] * self.num_stations
-
     def set_shift_register_values(self):
+        """
+        Activates GPIO based on self.station_status values
+        """
         if not GPIO:
             print('Error: set_shift_register_values() doesn\'t have GPIO module')
             return
@@ -149,23 +152,34 @@ class StationControl(object):
         self.toggle_shift_register_output(True)
         print('GPIO setup successfully')
 
+    def reset_stations(self):
+        self.station_status = [False] * self.num_stations
+
     def cleanup(self):
         self.reset_stations()
         GPIO.cleanup()
-
-    def water(self, station='-1', scheduled_time='23:59', duration='-1'):
+    
+    #def water(self, station='-1', scheduled_time='23:59', duration='-1'):
+    
+    def water(self, station, duration):
         self.watering = True
-        import time
-        print(
-            'water(station={}, scheduled_time={}, duration={}), time_now = {}'.format(station, scheduled_time, duration,
-                                                                                      str(datetime.now())))
-
+        print('Station {} watering for {} min at {}'.format(station, duration, datetime.now().strftime('%c')))
+                                                                                      
         # activate solenoid
+        self.set_station(station, True)
+        self.set_shift_register_values()
+  
+        # water and wait
         seconds = int(duration) * 60
         while seconds > 0:
-            print('drip.... second {}'.format(seconds))
-            time.sleep(1)
+            print('Drip.... second {}'.format(seconds))
+            sleep(1)
             seconds -= 1
+        
+        # deactivate solenoid
+        self.set_station(station, False)
+        self.set_shift_register_values()
+        
         print('Station {} finished watering'.format(station))
         self.watering = False
 
