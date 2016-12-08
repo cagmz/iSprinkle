@@ -80,26 +80,20 @@ class StationControl(object):
         # pause normal schedule
         jobs_paused = self.pause_schedule()
 
-        start, last_duration_seconds = Arrow.utcnow(), 0
-        start_buffer_seconds = 1
+        start, last_duration_seconds = Arrow.utcnow(), 5
+        start_buffer_seconds = 5
 
-        print('Original start: {}'.format(start))
         # for every station, set a scheduling for the duration specified
         # stations are ran serially
         for station, duration in watering_request.items():
             station_id = int(station)
             job_start = start.replace(seconds=last_duration_seconds)
-            print('Station {} will start at {} for {} minutes'.format(
-                station, job_start.format('HH:mm:ssZZ'), duration))
             self.bg_scheduler.add_job(self.water, 'date', run_date=job_start.datetime,
                                       args=[station_id, duration])
             last_duration_seconds = duration * 60
 
         # reschedule the original schedule after all stations have watered
-        print('start buffer in seconds is {}'.format(start_buffer_seconds))
         job_start = start.replace(seconds=last_duration_seconds + start_buffer_seconds)
-        print('job start for resuming schedule is {}'.format(job_start.format('HH:mm:ssZZ')))
-
         self.bg_scheduler.add_job(self.resume_schedule, 'date', run_date=job_start.datetime)
 
         # check if schedule contains: paused jobs, manual watering jobs, and extra job to resume paused jobs
@@ -151,6 +145,7 @@ class StationControl(object):
         GPIO.setup(StationControl.latch_pin, GPIO.OUT)
         self.set_shift_register_values()
         self.toggle_shift_register_output(True)
+        self.reset_stations()
         print('GPIO setup successfully')
 
     def reset_stations(self):
