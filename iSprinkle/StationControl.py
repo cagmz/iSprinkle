@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from dateutil.parser import parse
 from dateutil.tz import tz
 from arrow import Arrow
+from pytz import utc
 import atexit
 
 GPIO = None
@@ -30,7 +31,7 @@ class StationControl(object):
         self.utc_timezone_offset = datetime.now(timezone.utc).astimezone().strftime('%z')
         self.timezone_name = datetime.now(timezone.utc).astimezone().tzname()
         print('Operating in {} timezone ({})'.format(self.timezone_name, self.utc_timezone_offset))
-        self.bg_scheduler = BackgroundScheduler()
+        self.bg_scheduler = BackgroundScheduler(timezone=utc)
         self.set_schedule(self.data_handler.get_schedule())
 
         if GPIO:
@@ -46,16 +47,14 @@ class StationControl(object):
                 for start_time in stations[station][day]['start_times']:
                     station_id = int(station[-1])
                     time_str = day + " " + start_time['time'] + " " + self.utc_timezone_offset
-                    # get 12 hour time and convert to time-zone aware datetime object (24 hour UTC time) for use internally
+                    # convert to 12 hour time to time-zone aware datetime object (24 hour UTC time) for use internally
                     utc_time = timestr_to_utc(time_str)
                     duration = int(start_time['duration'])
-                    print('utc time is {}'.format(utc_time))
-                    print('Station {} will start at {} for {} minutes'.format(station_id, utc_time, duration))
-                    # TODO: set 'interval' trigger instead of 'date'.
-                    # Jobs may exit scheduler after running once if the 'date' trigger is used
-                    self.bg_scheduler.add_job(self.water, 'date', run_date=utc_time, args=[station_id, duration])
+                    print('Station {} will start at {} UTC for {} minutes'.format(station_id, utc_time, duration))
+                    self.bg_scheduler.add_job(self.water, 'interval', days=7, start_date=utc_time,
+                                              args=[station_id, duration])
             print('Added start times for station {}'.format(station))
-        
+
         # start the scheduler if it's not already running
         if not self.bg_scheduler.state:
             self.bg_scheduler.start()
@@ -131,11 +130,11 @@ class StationControl(object):
             GPIO.output(StationControl.out_pin, True)
 
     def setup_gpio(self):
-        
+
         if not GPIO:
             print('Error: setup_gpio() doesn\'t have GPIO module')
             return
-       
+
         # setup GPIO pins to interface with shift register
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(StationControl.clock_pin, GPIO.OUT)
@@ -154,28 +153,26 @@ class StationControl(object):
     def cleanup(self):
         self.reset_stations()
         GPIO.cleanup()
-        
+
     def water(self, station, duration):
-        self.watering = True
         print('Station {} watering for {} min at {}'.format(station, duration, datetime.now().strftime('%c')))
-                                                                                      
+
         # activate solenoid
         self.set_station(station, True)
         self.set_shift_register_values()
-  
+
         # water and wait
         seconds = int(duration) * 60
         while seconds > 0:
             print('Drip.... second {}'.format(seconds))
             sleep(1)
             seconds -= 1
-        
+
         # deactivate solenoid
         self.set_station(station, False)
         self.set_shift_register_values()
-        
+
         print('Station {} finished watering'.format(station))
-        self.watering = False
 
 
 def timestr_to_utc(time_str, local=True):
