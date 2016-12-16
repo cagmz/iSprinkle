@@ -21,11 +21,11 @@ class StationControl(object):
     data_pin = 27
     latch_pin = 22
 
-    def __init__(self, stations, data_handler):
-        self.num_stations = stations
-        self.station_status = [False] * self.num_stations
+    def __init__(self, data_handler):
         self.data_handler = data_handler
-        self.watering = False
+        self.station_status = {station_id: False for station_id in data_handler.settings['active_stations']}
+        self.active_stations = data_handler.settings['active_stations']
+        self.num_stations = len(self.station_status)
 
         # self.data_handler.get_schedule()['timezone_offset']
         self.utc_timezone_offset = datetime.now(timezone.utc).astimezone().strftime('%z')
@@ -43,9 +43,12 @@ class StationControl(object):
         self.bg_scheduler.remove_all_jobs()
         stations = settings_json['schedule']
         for station in stations:
+            station_id = int(station[-1])
+            if station_id not in self.active_stations:
+                continue
+
             for day in stations[station]:
                 for start_time in stations[station][day]['start_times']:
-                    station_id = int(station[-1])
                     time_str = day + " " + start_time['time'] + " " + self.utc_timezone_offset
                     # convert to 12 hour time to time-zone aware datetime object (24 hour UTC time) for use internally
                     utc_time = timestr_to_utc(time_str)
@@ -53,7 +56,6 @@ class StationControl(object):
                     print('Station {} will start at {} UTC for {} minutes'.format(station_id, utc_time, duration))
                     self.bg_scheduler.add_job(self.water, 'interval', days=7, start_date=utc_time,
                                               args=[station_id, duration])
-            print('Added start times for station {}'.format(station))
 
         # start the scheduler if it's not already running
         if not self.bg_scheduler.state:

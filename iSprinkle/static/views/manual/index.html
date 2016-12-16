@@ -6,9 +6,8 @@
         <div class="panel-body">
             <div id="manualInputContainer">
                 <form class="form-horizontal" id="manualWateringInput" style="padding: 10px">
-                    <div ng-repeat="station in stations" class="form-group row">
-                        <label class="form-control-static col-xs-2">Station {{ station.id + 1}}</label>
-                        <!-- use ng-if on duration. if > 0, display progress bar -->
+                    <div ng-repeat="station in activeStations" class="form-group row">
+                        <label class="form-control-static col-xs-2">Station {{ (station.id + 1) }}</label>
                         <div class="col-xs-10 input-group">
                             <input ng-model="station.duration" class="form-control" type="number" min="0"
                                    placeholder="0">

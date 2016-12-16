@@ -29,6 +29,7 @@ class DataHandler(object):
             default_settings = {
                 "user": "New user",
                 "timezone_offset": "-08:00",
+                "active_stations": [0, 1, 2, 3, 4, 5, 6, 7],
                 "schedule": {
                     "s0": {
                         "Monday": {"start_times": []},
@@ -107,7 +108,10 @@ class DataHandler(object):
             self.settings = default_settings
             self.write_settings(default_settings)
 
-    def write_settings(self, settings_json):
+    def write_settings(self, settings_json=None):
+        if not settings_json:
+            settings_json = self.settings
+
         try:
             with open(self.settings_path, 'w') as settings_file_handle:
                 json.dump(settings_json, settings_file_handle)
@@ -125,6 +129,13 @@ class DataHandler(object):
             return self.settings[key]
         except KeyError:
             return "Error: key {} doesn't exist in the DataHandler settings".format(key)
+
+    def set_settings_key(self, key, value):
+        self.settings[key] = value
+
+    def update_settings(self, data):
+        for key, value in data.items():
+            self.set_settings_key(key, value)
 
     def init_database(self):
         if not os.path.isfile(self.database_path):

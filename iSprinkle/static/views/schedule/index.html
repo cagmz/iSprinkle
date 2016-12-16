@@ -12,16 +12,19 @@
         if (!$('#wateringTimeInputContainer').is(':visible')) {
             $('#addWateringTimeBtn').hide();
             $('#wateringTimeInputContainer').show();
+
             $('.selectpicker').selectpicker({
                 style: 'btn-default',
                 noneSelectedText: 'None selected'
             });
+
             $('#startTimeInput').timepicker({
                 defaultTime: '12:00 AM',
                 template: false,
                 showInputs: false,
                 minuteStep: 5
             });
+
         } else {
             $('#addWateringTimeBtn').show();
             $('#wateringTimeInputContainer').hide();
@@ -62,6 +65,12 @@
                         <div class="form-group row">
                             <label class="form-control-static col-xs-2" for="stationsSelectBox">Stations</label>
                             <div class="col-xs-10">
+                                <select class="selectpicker" multiple data-actions-box="true" ng-model="activeStations">
+                                    <option ng-repeat="station in activeStations" value="{{station}}">
+                                        {{ station + 1 }}
+                                    </option>
+                                </select>
+                                <!--
                                 <select class="selectpicker" multiple data-actions-box="true" ng-model="stations">
                                     <option value="0">1</option>
                                     <option value="1">2</option>
@@ -72,6 +81,7 @@
                                     <option value="6">7</option>
                                     <option value="7">8</option>
                                 </select>
+                                -->
                             </div>
                         </div>
                         <!-- Duration -->

@@ -2,16 +2,34 @@ from iSprinkle import *
 from flask import jsonify, request
 
 
-@app.route('/api/stations')
-def stations():
+@app.route('/api/stations/all')
+def all_stations():
     return jsonify(stations=iSprinkle.station_control.num_stations)
+
+
+@app.route('/api/stations/active')
+def active_stations():
+    return jsonify(stations=iSprinkle.data_handler.settings['active_stations'])
+
+
+@app.route('/api/settings', methods=['POST'])
+def settings():
+    updated_settings = request.get_json()
+    iSprinkle.data_handler.update_settings(updated_settings)
+    result = iSprinkle.data_handler.write_settings()
+    post_reply = {}
+    if result:
+        post_reply['reply'] = 'Success'
+    else:
+        post_reply['reply'] = 'Error saving settings'
+    return jsonify(post_reply)
 
 
 @app.route('/api/manual', methods=['GET', 'POST'])
 def manual():
     if request.method == 'POST':
-        manualWaterRequest = request.get_json()
-        result = iSprinkle.station_control.manual_watering(manualWaterRequest)
+        manual_water_request = request.get_json()
+        result = iSprinkle.station_control.manual_watering(manual_water_request)
         post_reply = {}
         if result:
             post_reply['reply'] = 'Success'
