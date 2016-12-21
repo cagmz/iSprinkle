@@ -1,5 +1,14 @@
+import sys
 from iSprinkle import app, setup
 
 if __name__ == '__main__':
     setup()
-    app.run(port=8080, host='0.0.0.0')
+    port = 8081
+
+    if len(sys.argv) == 2:
+        try:
+            port = int(sys.argv[1])
+        except TypeError:
+            pass
+
+    app.run(port=port, host='0.0.0.0')
