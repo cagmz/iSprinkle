@@ -10,6 +10,9 @@ iSprinkleApp.factory('StationFactory', ['$http', '$log', function ($http, $log) 
         getActiveStations: function() {
             return $http.get('api/stations/active');
         },
+        getSettings: function() {
+            return $http.get('api/settings');
+        },
         getUsage: function (startDate, endDate, stations) {
             var queryString = '?startDate=' + startDate + '&endDate=' + endDate + '&stations=' + stations;
             return $http.get('api/usage' + queryString);

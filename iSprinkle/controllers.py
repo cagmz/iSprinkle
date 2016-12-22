@@ -12,17 +12,24 @@ def active_stations():
     return jsonify(stations=iSprinkle.data_handler.settings['active_stations'])
 
 
-@app.route('/api/settings', methods=['POST'])
+@app.route('/api/settings', methods=['GET', 'POST'])
 def settings():
-    updated_settings = request.get_json()
-    iSprinkle.data_handler.update_settings(updated_settings)
-    result = iSprinkle.data_handler.write_settings()
     post_reply = {}
-    if result:
-        post_reply['reply'] = 'Success'
-    else:
-        post_reply['reply'] = 'Error saving settings'
-    return jsonify(post_reply)
+    if request.method == 'POST':
+        updated_settings = request.get_json()
+        iSprinkle.data_handler.update_settings(updated_settings)
+        result = iSprinkle.data_handler.write_settings()
+        if result:
+            post_reply['reply'] = 'Success'
+        else:
+            post_reply['reply'] = 'Error saving settings'
+        return jsonify(post_reply)
+    elif request.method == 'GET':
+        # settings for admin view
+        post_reply = {'location': iSprinkle.data_handler.settings['location'],
+                      'utc_timezone_offset': iSprinkle.data_handler.settings['utc_timezone_offset'],
+                      'timezone_name': iSprinkle.data_handler.settings['timezone_name']}
+        return jsonify(post_reply)
 
 
 @app.route('/api/manual', methods=['GET', 'POST'])

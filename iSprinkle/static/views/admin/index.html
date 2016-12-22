@@ -1,8 +1,8 @@
 <script>
-                $('.selectpicker').selectpicker({
-                style: 'btn-default',
-                noneSelectedText: 'None selected'
-            });
+    $('.selectpicker').selectpicker({
+        style: 'btn-default',
+        noneSelectedText: 'None selected'
+    });
 </script>
 
 <div class="panel panel-default">
@@ -11,30 +11,81 @@
     </div>
     <div class="panel-body">
         <div class="form-group" id="adminStatusContainer">
-            <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1">LAN IP</span>
-                <input type="text" class="form-control" ng-value="ip">
+
+            <div class="panel panel-default" id="locationInputContainer">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        System
+                    </h4>
+                </div>
+                <div class="panel-body">
+
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">LAN IP</span>
+                        <input type="text" class="form-control" ng-value="ip">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">Uptime</span>
+                        <input type="text" class="form-control" ng-value="uptime">
+                    </div>
+
+                </div>
             </div>
 
-            <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1">Uptime</span>
-                <input type="text" class="form-control" ng-value="uptime">
+            <div class="panel panel-default" id="locationInputContainer">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        Station Control
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <label class="form-control-static col-xs-2" for="stationsSelectBox">Active Stations</label>
+                        <div class="col-xs-10">
+                            <select class="selectpicker" multiple data-actions-box="true" ng-model="activeStations">
+                                <option value="0">1</option>
+                                <option value="1">2</option>
+                                <option value="2">3</option>
+                                <option value="3">4</option>
+                                <option value="4">5</option>
+                                <option value="5">6</option>
+                                <option value="6">7</option>
+                                <option value="7">8</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Active Stations -->
-            <div class="row">
-                <label class="form-control-static col-xs-2" for="stationsSelectBox">Active Stations</label>
-                <div class="col-xs-10">
-                    <select class="selectpicker" multiple data-actions-box="true" ng-model="activeStations">
-                        <option value="0">1</option>
-                        <option value="1">2</option>
-                        <option value="2">3</option>
-                        <option value="3">4</option>
-                        <option value="4">5</option>
-                        <option value="5">6</option>
-                        <option value="6">7</option>
-                        <option value="7">8</option>
-                    </select>
+
+            <div class="panel panel-default" id="locationInputContainer">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        Location
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">Address</span>
+                        <input type="text" class="form-control" ng-model="address"
+                               placeholder="Update lat/long by entering address">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">Latitude</span>
+                        <input type="text" class="form-control" ng-value="settings.location.lat">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">Longitude</span>
+                        <input type="text" class="form-control" ng-value="settings.location.lng">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">Timezone</span>
+                        <input type="text" class="form-control" ng-value="settings.timezone_name">
+                    </div>
                 </div>
             </div>
 
@@ -44,7 +95,7 @@
                     Refresh
                 </button>
                 <button type="button" id="saveSettings" class="btn btn-default"
-                        ng-click="saveSettings(activeStations)">
+                        ng-click="saveSettings(activeStations, address)">
                     Save
                 </button>
             </div>
