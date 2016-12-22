@@ -383,8 +383,8 @@ iSprinkleApp.controller('ManualController', ['$scope', '$http', '$log', '$route'
 
     }]);
 
-iSprinkleApp.controller('AdminController', ['$scope', '$http', '$log', 'StationFactory',
-    function AdminController($scope, $http, $log, StationFactory) {
+iSprinkleApp.controller('AdminController', ['$scope', '$http', '$route', '$log', 'StationFactory',
+    function AdminController($scope, $http, $route, $log, StationFactory) {
 
         $scope.ip = 'Error finding LAN IP.';
         $scope.uptime = 'Error finding uptime.';
@@ -400,34 +400,68 @@ iSprinkleApp.controller('AdminController', ['$scope', '$http', '$log', 'StationF
                 }, errorCallback);
         };
 
-        $scope.saveSettings = function saveSettings(activeStations) {
-            var updated_settings = {};
+        $scope.settings = {};
+        StationFactory.getSettings().then(function (response) {
+            $scope.settings = response.data;
+            $log.debug($scope.settings);
+        }, function () {
+            window.alert('Error fetching settings.');
+        });
 
-            activeStations = activeStations.map(function (element) {
-                return parseInt(element);
-            });
+        $scope.saveSettings = function saveSettings(activeStations, address) {
 
-            updated_settings['active_stations'] = activeStations;
+            if (activeStations) {
+                activeStations = activeStations.map(function (element) {
+                    return parseInt(element);
+                });
+                $scope.settings['active_stations'] = activeStations;
+            }
 
-            $http.post('api/settings', updated_settings).then(
-                function (response) {
-                    if (response.data.reply === 'Settings saved') {
-                        window.alert('Settings saved');
-                        $route.reload();
-                    } else {
-                        errorSavingCallback(response.data.reply);
-                    }
-                },
-                errorSavingCallback);
+            if (address) {
+                $log.debug('requesting data from : ' + 'https://maps.googleapis.com/maps/api/geocode/json?address=' + address);
+                $http.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + address).then(
+                    function (response) {
 
-            function errorSavingCallback(err) {
-                err === undefined ? window.alert('Error saving settings') : window.alert(err);
+                        if (response.data.status !== 'OK') {
+                            errorGeocoding(address);
+                            return;
+                        }
+
+                        $scope.settings['location'] = response.data.results[0].geometry.location;
+
+                        $http.post('api/settings', $scope.settings).then(
+                            function (response) {
+
+                                $log.debug('posting the following:');
+                                $log.debug($scope.settings);
+
+                                if (response.data.reply === 'Success') {
+                                    window.alert('Settings saved');
+                                    $route.reload();
+                                } else {
+                                    errorSavingCallback(response.data.reply);
+                                }
+                            },
+                            errorSavingCallback);
+                    },
+                    errorGeocoding
+                );
+
+
             }
 
         };
 
         function errorCallback(err) {
-            err === undefined ? window.alert('Error refreshing ' + err + '.') : window.alert(err);
+            err === undefined ? window.alert('Error contacting web API ' + err + '.') : window.alert(err);
+        }
+
+        function errorSavingCallback(err) {
+            err === undefined ? window.alert('Error saving settings') : window.alert(err);
+        }
+
+        function errorGeocoding(address) {
+            window.alert('Error finding latitude/longitude for ' + address);
         }
 
         $scope.refreshStatus();

@@ -27,7 +27,6 @@ class StationControl(object):
         self.active_stations = data_handler.settings['active_stations']
         self.num_stations = len(self.station_status)
 
-        # self.data_handler.get_schedule()['timezone_offset']
         self.utc_timezone_offset = datetime.now(timezone.utc).astimezone().strftime('%z')
         self.timezone_name = datetime.now(timezone.utc).astimezone().tzname()
         print('Operating in {} timezone ({})'.format(self.timezone_name, self.utc_timezone_offset))
@@ -52,10 +51,11 @@ class StationControl(object):
                     time_str = day + " " + start_time['time'] + " " + self.utc_timezone_offset
                     # convert to 12 hour time to time-zone aware datetime object (24 hour UTC time) for use internally
                     utc_time = timestr_to_utc(time_str)
-                    duration = int(start_time['duration'])
-                    print('Station {} will start at {} UTC for {} minutes'.format(station_id, utc_time, duration))
-                    self.bg_scheduler.add_job(self.water, 'interval', days=7, start_date=utc_time,
-                                              args=[station_id, duration])
+                    fixed_duration = int(start_time['duration'])
+                    print('Station {} will start at {} UTC for {} minutes'.format(station_id, utc_time, fixed_duration))
+                    args = {'datetime': str(utc_time).replace(' ', 'T'), 'station': station_id,
+                            'fixed_duration': fixed_duration, 'manual': 0}
+                    self.bg_scheduler.add_job(self.water, 'interval', days=7, start_date=utc_time, args=[args])
 
         # start the scheduler if it's not already running
         if not self.bg_scheduler.state:
@@ -86,11 +86,15 @@ class StationControl(object):
 
         # for every station, set a scheduling for the duration specified
         # stations are ran serially
+
         for station, duration in watering_request.items():
             station_id = int(station)
             job_start = start.replace(seconds=last_duration_seconds)
-            self.bg_scheduler.add_job(self.water, 'date', run_date=job_start.datetime,
-                                      args=[station_id, duration])
+
+            dt = job_start.format('YYYY-MM-DDTHH:mm:ssZZ').replace('-00:00', '+00:00')
+            args = {'datetime': dt, 'station': station_id, 'fixed_duration': duration, 'manual': 1}
+            self.bg_scheduler.add_job(self.water, 'date', run_date=job_start.datetime, args=[args])
+
             last_duration_seconds = duration * 60
 
         # reschedule the original schedule after all stations have watered
@@ -156,15 +160,37 @@ class StationControl(object):
         self.reset_stations()
         GPIO.cleanup()
 
-    def water(self, station, duration):
-        print('Station {} watering for {} min at {}'.format(station, duration, datetime.now().strftime('%c')))
+    def optimize_duration(self, fixed_duration):
+        optimized, forecasted_temp, base_temp = fixed_duration, 70, 75
+
+        # call data handler and get historical for last 7 days, inc. today
+        # if it rained today, don't water, return 0
+
+        # else return int(forecasted_temp * (fixed_duration/avg_temp))
+
+        return optimized, forecasted_temp, base_temp
+
+    def water(self, args):
+        """
+        args parameter contains a dict with args that are necessary for watering (station, duration).
+        other args are for optimizing the duration (fixed_duration)
+        the return values from optimize_duration will also be inserted into the dict
+        args will be passed to data_handler for insertion; all keys map directly to columns in the historical table
+        :param args: dictionary with keys 'datetime', 'station', 'fixed_duration', 'manual'
+        """
+        station = args['station']
+        fixed_duration = args['fixed_duration']
+
+        optimized_duration, forecasted_temp, base_temp = self.optimize_duration(fixed_duration)
+
+        print('Station {} watering for {} min at {}'.format(station, optimized_duration, datetime.now().strftime('%c')))
 
         # activate solenoid
         self.set_station(station, True)
         self.set_shift_register_values()
 
         # water and wait
-        seconds = int(duration) * 60
+        seconds = int(optimized_duration) * 60
         while seconds > 0:
             print('Drip.... second {}'.format(seconds))
             sleep(1)
@@ -175,6 +201,14 @@ class StationControl(object):
         self.set_shift_register_values()
 
         print('Station {} finished watering'.format(station))
+
+        # add a few more k, v pairs before passing to data_handler for building a SQL insert statement
+        args['forecasted_temp'] = forecasted_temp
+        args['base_temp'] = base_temp
+        args['optimized_duration'] = optimized_duration
+
+        # send args to data handler for insertion to db
+        self.data_handler.insert_historical_record(args)
 
 
 def timestr_to_utc(time_str, local=True):
