@@ -389,16 +389,14 @@ iSprinkleApp.controller('AdminController', ['$scope', '$http', '$route', '$log',
         $scope.ip = 'Error finding LAN IP.';
         $scope.uptime = 'Error finding uptime.';
 
-        $scope.refreshStatus = function refreshStatus() {
-            StationFactory.getLanIP().then(
-                function (response) {
-                    $scope.ip = response.data;
-                }, errorCallback);
-            StationFactory.getUptime().then(
-                function (response) {
-                    $scope.uptime = response.data;
-                }, errorCallback);
-        };
+        StationFactory.getLanIP().then(
+            function (response) {
+                $scope.ip = response.data;
+            }, errorCallback);
+        StationFactory.getUptime().then(
+            function (response) {
+                $scope.uptime = response.data;
+            }, errorCallback);
 
         $scope.settings = {};
         StationFactory.getSettings().then(function (response) {
@@ -418,7 +416,7 @@ iSprinkleApp.controller('AdminController', ['$scope', '$http', '$route', '$log',
             }
 
             if (address) {
-                $log.debug('requesting data from : ' + 'https://maps.googleapis.com/maps/api/geocode/json?address=' + address);
+
                 $http.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + address).then(
                     function (response) {
 
@@ -431,10 +429,6 @@ iSprinkleApp.controller('AdminController', ['$scope', '$http', '$route', '$log',
 
                         $http.post('api/settings', $scope.settings).then(
                             function (response) {
-
-                                $log.debug('posting the following:');
-                                $log.debug($scope.settings);
-
                                 if (response.data.reply === 'Success') {
                                     window.alert('Settings saved');
                                     $route.reload();
@@ -446,7 +440,6 @@ iSprinkleApp.controller('AdminController', ['$scope', '$http', '$route', '$log',
                     },
                     errorGeocoding
                 );
-
 
             }
 
@@ -463,7 +456,5 @@ iSprinkleApp.controller('AdminController', ['$scope', '$http', '$route', '$log',
         function errorGeocoding(address) {
             window.alert('Error finding latitude/longitude for ' + address);
         }
-
-        $scope.refreshStatus();
 
     }]);
