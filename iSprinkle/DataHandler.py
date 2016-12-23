@@ -1,8 +1,10 @@
 import os
 import json
 import sqlite3
+import requests
+import pickle
 from datetime import datetime, timezone
-
+from collections import OrderedDict
 
 class DataHandler(object):
     def __init__(self, root_path):
@@ -14,6 +16,11 @@ class DataHandler(object):
         database_file = '../data/database.db'
         self.database_path = os.path.join(root_path, database_file)
         self.init_database()
+
+        weather_cache_file = '../data/weather_cache.pkl'
+        self.weather_cache_path = os.path.join(root_path, weather_cache_file)
+        self.weather_cache = OrderedDict()
+        self.load_weather_cache()
 
     # loads from filesystem
     def load_settings(self):
@@ -142,3 +149,41 @@ class DataHandler(object):
                       args['base_temp'], args['optimized_duration'], args['manual']))
         conn.commit()
         conn.close()
+
+    def update_weather_cache(self):
+
+        if len(self.settings['location']) == 0:
+            print('Error: unable to update weather cache (missing location)')
+            return
+
+        # check weather cache for freshness. generate the a date range for the past 7 days, including today,
+        # and make weather api request if needed
+
+        key = ''
+        latitude = '37.4226981' #self.settings['location']['lat']
+        longitude = '-122.1686022'
+        unix_time = 1480665600
+        excluded_blocks = 'minutely,hourly'
+
+
+
+        request = 'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}'.format(key, latitude, longitude, unix_time, excluded_blocks)
+        r = requests.get(request)
+
+        today = []
+        past_week = []
+
+        # generate unix times for past 7 days, including today, and fetch weather forecasts for each
+
+
+        # print(r.json())
+
+    def load_weather_cache(self):
+        if not os.path.isfile(self.weather_cache_path):
+            with open(self.weather_cache_path, 'wb') as weather_cache_file:
+                pickle.dump(self.weather_cache, weather_cache_file)
+        else:
+            with open(self.weather_cache_path, 'rb') as weather_cache_file:
+                self.weather_cache = pickle.load(weather_cache_file)
+
+        self.update_weather_cache()
