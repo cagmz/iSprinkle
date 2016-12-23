@@ -27,8 +27,8 @@ class StationControl(object):
         self.active_stations = data_handler.settings['active_stations']
         self.num_stations = len(self.station_status)
 
-        self.utc_timezone_offset = datetime.now(timezone.utc).astimezone().strftime('%z')
-        self.timezone_name = datetime.now(timezone.utc).astimezone().tzname()
+        self.utc_timezone_offset = self.data_handler.settings['utc_timezone_offset']
+        self.timezone_name = self.data_handler.settings['timezone_name']
         print('Operating in {} timezone ({})'.format(self.timezone_name, self.utc_timezone_offset))
         self.bg_scheduler = BackgroundScheduler(timezone=utc)
         self.set_schedule(self.data_handler.get_schedule())

@@ -22,12 +22,12 @@
 
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">LAN IP</span>
-                        <input type="text" class="form-control" ng-value="ip">
+                        <input type="text" class="form-control" ng-value="ip" readonly>
                     </div>
 
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">Uptime</span>
-                        <input type="text" class="form-control" ng-value="uptime">
+                        <input type="text" class="form-control" ng-value="uptime" readonly>
                     </div>
 
                 </div>
@@ -74,31 +74,28 @@
 
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">Latitude</span>
-                        <input type="text" class="form-control" ng-value="settings.location.lat">
+                        <input type="text" class="form-control" ng-value="settings.location.lat" readonly>
                     </div>
 
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">Longitude</span>
-                        <input type="text" class="form-control" ng-value="settings.location.lng">
+                        <input type="text" class="form-control" ng-value="settings.location.lng" readonly>
                     </div>
 
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">Timezone</span>
-                        <input type="text" class="form-control" ng-value="settings.timezone_name">
+                        <input type="text" class="form-control" ng-value="settings.timezone_name" readonly>
                     </div>
                 </div>
             </div>
-
-            <div class="btn-toolbar pull-right">
-                <button type="button" id="refreshAdmin" class="btn btn-default"
-                        ng-click="refreshStatus()">
-                    Refresh
-                </button>
-                <button type="button" id="saveSettings" class="btn btn-default"
-                        ng-click="saveSettings(activeStations, address)">
-                    Save
-                </button>
-            </div>
+        </div>
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button type="button" id="saveSettings" class="btn btn-default"
+                    ng-click="saveSettings(activeStations, address)">
+                Save
+            </button>
         </div>
     </div>
 </div> <!-- /AdminController div -->
