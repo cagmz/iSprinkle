@@ -77,11 +77,6 @@ iSprinkleApp.controller('HomeController', ['$scope', '$http', '$log', 'StationFa
                     optimized_watering.push(plot_opt);
                 }
 
-                // $log.debug('fixed:');
-                // $log.debug(fixed_watering);
-                // $log.debug('opt:');
-                // $log.debug(optimized_watering);
-
                 // update size of chart before plotting
                 $scope.options.chart.height = 450;
                 return [{values: fixed_watering, key: 'Fixed', color: '#1b75ba'},
@@ -178,13 +173,10 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
         $scope.activeStations = {};
         StationFactory.getActiveStations().then(function (response) {
             $scope.activeStations = response.data.stations;
-            $log.debug($scope.activeStations);
 
             StationFactory.getSchedule().then(function (response) {
 
                 $scope.scheduleData = response.data;
-                $log.debug('Schedule: ');
-                $log.debug($scope.scheduleData.schedule);
 
                 // view uses tableHeader to create table heading dynamically
                 $scope.tableHeader = ['Stations'].concat($scope.weekdays);
@@ -234,10 +226,6 @@ iSprinkleApp.controller('ScheduleController', ['$scope', '$http', '$log', '$comp
 
 
         $scope.saveSchedule = function saveSchedule() {
-            // could use jQuery modal instead of alert
-            $log.debug($scope.scheduleData);
-            $log.debug($scope.scheduleData.schedule);
-
             // remove stations with 0 as duration
             for (var station in $scope.scheduleData.schedule) {
                 var stationInfo = $scope.scheduleData.schedule[station];
@@ -351,7 +339,6 @@ iSprinkleApp.controller('ManualController', ['$scope', '$http', '$log', '$route'
             var manualWaterRequest = {};
             for (var i = 0; i < $scope.activeStations.length; i++) {
                 var stationObj = $scope.activeStations[i];
-                $log.debug(stationObj);
                 if (stationObj.duration > 0) {
                     manualWaterRequest[stationObj.id] = stationObj.duration;
                 }
@@ -401,7 +388,6 @@ iSprinkleApp.controller('AdminController', ['$scope', '$http', '$route', '$log',
         $scope.settings = {};
         StationFactory.getSettings().then(function (response) {
             $scope.settings = response.data;
-            $log.debug($scope.settings);
         }, function () {
             window.alert('Error fetching settings.');
         });
