@@ -3,7 +3,8 @@ import json
 import sqlite3
 import requests
 import pickle
-from datetime import datetime, timezone
+import arrow
+from datetime import timezone, datetime, date, timedelta
 from collections import OrderedDict
 
 class DataHandler(object):
@@ -18,9 +19,11 @@ class DataHandler(object):
         self.init_database()
 
         weather_cache_file = '../data/weather_cache.pkl'
+        self.weather_cache_size = 8
         self.weather_cache_path = os.path.join(root_path, weather_cache_file)
         self.weather_cache = OrderedDict()
         self.load_weather_cache()
+
 
     # loads from filesystem
     def load_settings(self):
@@ -150,38 +153,75 @@ class DataHandler(object):
         conn.commit()
         conn.close()
 
+    def generate_weather_cache_dates(self):
+        """
+        Returns a list of date strings in the range between [today - weather_cache_size days, today]
+        Strings are formatted to be used with Dark Sky API
+        The date strings are sorted from latest -> earliest (today at index 0)
+        """
+
+        # generate the date objects for the past weather_cache_size days, including today
+        today = date.today()
+        past_dates = [today - timedelta(days=x) for x in range(self.weather_cache_size)]
+
+        # convert date objects to strings in the format required for Dark Sky API
+        past_dates = [arrow.get(d).format('YYYY-MM-DDTHH:mm:ss') for d in past_dates]
+        return past_dates
+
     def update_weather_cache(self):
 
         if len(self.settings['location']) == 0:
             print('Error: unable to update weather cache (missing location)')
             return
 
-        # check weather cache for freshness. generate the a date range for the past 7 days, including today,
-        # and make weather api request if needed
+        cached_dates = set(self.weather_cache.keys())
 
-        key = ''
-        latitude = '37.4226981' #self.settings['location']['lat']
-        longitude = '-122.1686022'
-        unix_time = 1480665600
-        excluded_blocks = 'minutely,hourly'
+        past_dates = set(self.generate_weather_cache_dates())
 
+        # create a set of dates in common between dates needed and those in cache
+        common_dates = cached_dates & past_dates
 
+        # a set of dates in dates_in_cache but not in past_week
+        dates_to_request = past_dates - common_dates
 
-        request = 'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}'.format(key, latitude, longitude, unix_time, excluded_blocks)
-        r = requests.get(request)
+        # delete stale dates from weather_cache (dates in cached_dates that are not in the past_dates)
+        stale_dates = cached_dates - past_dates
 
-        today = []
-        past_week = []
+        for old_date in stale_dates:
+            del self.weather_cache[old_date]
 
-        # generate unix times for past 7 days, including today, and fetch weather forecasts for each
+        print('Need to request the following dates: {}'.format(dates_to_request))
 
+        llave = 'd2b86bb26ffc7100739f5769527af4ad'
+        latitude = self.settings['location']['lat']
+        longitude = self.settings['location']['lng']
 
-        # print(r.json())
+        # only request 'daily' data block from API
+        excluded_blocks = 'currently,minutely,hourly,alerts,flags'
+
+        for forecast_date in dates_to_request:
+            request = 'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}'.format(llave, latitude, longitude,
+                                                                                       forecast_date, excluded_blocks)
+            response = requests.get(request)
+
+            if not response.ok:
+                print('Failed to fetch forecast for date '.format(forecast_date))
+                continue
+
+            forecast = response.json()['daily']['data'][0]
+            if forecast:
+                print('Got forecast for date {}'.format(forecast_date))
+                self.weather_cache[forecast_date] = forecast
+
+        self.write_weather_cache()
+
+    def write_weather_cache(self):
+        with open(self.weather_cache_path, 'wb') as weather_cache_file:
+            pickle.dump(self.weather_cache, weather_cache_file)
 
     def load_weather_cache(self):
         if not os.path.isfile(self.weather_cache_path):
-            with open(self.weather_cache_path, 'wb') as weather_cache_file:
-                pickle.dump(self.weather_cache, weather_cache_file)
+            self.write_weather_cache()
         else:
             with open(self.weather_cache_path, 'rb') as weather_cache_file:
                 self.weather_cache = pickle.load(weather_cache_file)

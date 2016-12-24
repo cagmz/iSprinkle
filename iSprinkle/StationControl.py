@@ -78,14 +78,15 @@ class StationControl(object):
         print('Resumed schedule')
 
     def manual_watering(self, watering_request):
-        # pause normal schedule
+        """
+        Pause existing schedule jobs and create a new watering job for every station in watering request.
+        Water jobs are executed serially.
+        """
+
         jobs_paused = self.pause_schedule()
 
         start, last_duration_seconds = Arrow.utcnow(), 5
         start_buffer_seconds = 5
-
-        # for every station, set a scheduling for the duration specified
-        # stations are ran serially
 
         for station, duration in watering_request.items():
             station_id = int(station)
